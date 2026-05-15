@@ -308,7 +308,7 @@ async function speakText(text) {
   const GEMINI_KEY = 'AIzaSyCQPIXX_GV2fQ5xdMr31v3uCzle0bgHc4Q';
   const VOICE_NAME = 'Zephyr';
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/ggemini-3.1-flash-tts-preview:generateContent?key=${GEMINI_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent?key=${GEMINI_KEY}`;
 
   const payload = {
     contents: [{ role: "user", parts: [{ text }] }],
