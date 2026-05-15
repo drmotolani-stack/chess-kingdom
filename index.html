@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Chess Kingdom</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1E1B2E">
 <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Chess_zdt45.svg/1024px-Chess_zdt45.svg.png">
@@ -15,8 +15,6 @@
 body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;overflow-x:hidden;user-select:none;}
 .screen{display:none;min-height:100vh;flex-direction:column;align-items:center;}
 .screen.active{display:flex;}
-
-/* STARS */
 .stars-bg{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:0;}
 .star{position:absolute;background:white;border-radius:50%;animation:twinkle 2s infinite alternate;}
 @keyframes twinkle{from{opacity:.2}to{opacity:1}}
@@ -27,14 +25,9 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 @keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(130px) rotate(720deg);opacity:0}}
-@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 @keyframes glow{0%,100%{box-shadow:0 0 10px rgba(255,215,0,.3)}50%{box-shadow:0 0 25px rgba(255,215,0,.7)}}
-
-/* MUTE BUTTON */
-.mute-btn { position:fixed; top:15px; right:15px; background:rgba(0,0,0,0.3); border:2px solid var(--gold); border-radius:50%; width:45px; height:45px; font-size:1.4rem; cursor:pointer; z-index:1000; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2); transition:transform 0.1s; }
-.mute-btn:active { transform:scale(0.9); }
-
-/* NAME SCREEN */
+.mute-btn{position:fixed;top:15px;right:15px;background:rgba(0,0,0,0.3);border:2px solid var(--gold);border-radius:50%;width:45px;height:45px;font-size:1.4rem;cursor:pointer;z-index:1000;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,0.2);transition:transform 0.1s;}
+.mute-btn:active{transform:scale(0.9);}
 #screen-name{background:linear-gradient(180deg,#1a1a2e,#16213e 50%,#0f3460);justify-content:center;padding:2rem;gap:1.8rem;}
 .name-logo{font-family:'Fredoka One',cursive;font-size:3rem;color:var(--gold);text-shadow:0 0 30px rgba(255,215,0,.5);text-align:center;z-index:1;animation:float 3s ease-in-out infinite;}
 .chess-icon-big{font-size:5rem;text-align:center;z-index:1;animation:bounce 2s ease-in-out infinite;}
@@ -46,8 +39,6 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .btn-start{width:100%;max-width:320px;padding:1.1rem;border-radius:50px;border:none;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1a2e;font-size:1.4rem;font-family:'Fredoka One',cursive;cursor:pointer;z-index:1;box-shadow:0 8px 25px rgba(255,215,0,.4);animation:pulse 2s ease-in-out infinite;transition:transform .1s;}
 .btn-start:hover{transform:scale(1.04);}
 .btn-start:active{transform:scale(.96);}
-
-/* HOME */
 #screen-home{background:linear-gradient(180deg,#87CEEB,#98FB98 60%,#228B22);padding:0;overflow-y:auto;}
 .home-header{width:100%;background:linear-gradient(135deg,#1E1B2E,#2D1B69);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;box-shadow:0 4px 20px rgba(0,0,0,.3);}
 .hero-info{display:flex;align-items:center;gap:.75rem;}
@@ -72,8 +63,6 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .world-progress-fill{height:100%;background:rgba(255,255,255,.9);border-radius:10px;transition:width .5s ease;}
 .stars-row{display:flex;gap:4px;margin-top:.4rem;}
 .lock-icon{position:absolute;right:1.2rem;top:50%;transform:translateY(-50%);font-size:1.8rem;}
-
-/* LESSON */
 #screen-lesson{background:linear-gradient(180deg,#1a1a2e,#16213e);padding:0;overflow-y:auto;}
 .lesson-header{width:100%;padding:1rem 1.5rem;display:flex;align-items:center;gap:1rem;background:rgba(255,255,255,.05);}
 .btn-back{background:rgba(255,255,255,.15);border:none;border-radius:50%;width:44px;height:44px;color:white;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0;}
@@ -89,20 +78,16 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .lesson-speech{background:rgba(255,215,0,.1);border:2px solid rgba(255,215,0,.3);border-radius:16px;padding:1rem;color:var(--gold);font-size:1.1rem;font-weight:700;font-style:italic;margin-top:.5rem;position:relative;}
 .lesson-speech::before{content:'"';font-size:3rem;position:absolute;top:-10px;left:10px;color:var(--gold);opacity:.3;}
 .btn-next{width:100%;max-width:300px;padding:1rem;border-radius:50px;border:none;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1a2e;font-size:1.3rem;font-family:'Fredoka One',cursive;cursor:pointer;box-shadow:0 6px 20px rgba(255,215,0,.35);transition:transform .1s;}
-
-/* BOARD - MAGICAL FOREST AESTHETIC */
 .board-wrap{width:100%;display:flex;flex-direction:column;align-items:center;gap:1rem;}
 .chess-board{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);width:min(336px,88vw);height:min(336px,88vw);border-radius:16px;overflow:hidden;border:4px solid var(--gold);box-shadow:0 0 30px rgba(255,215,0,.3);flex-shrink:0;gap:4px;padding:4px;background:rgba(255,255,255,0.15);}
 .cell{display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .1s,filter .2s;position:relative;min-width:0;min-height:0;overflow:hidden;}
 .cell.light{background:#E2F0CB;border-radius:6px;box-shadow:inset 0 -3px 0 rgba(0,0,0,0.1);}
 .cell.dark{background:#88D49E;border-radius:6px;box-shadow:inset 0 -3px 0 rgba(0,0,0,0.1);}
 .cell.highlight{background:rgba(255,215,0,.6)!important;animation:pulse .5s ease;}
-.cell.target{background:rgba(255,215,0,.4)!important; border:3px solid var(--gold)!important; box-shadow:0 0 20px rgba(255,215,0,.8)!important; z-index:2; animation:glow 1.2s ease-in-out infinite!important;}
+.cell.target{background:rgba(255,215,0,.4)!important;border:3px solid var(--gold)!important;box-shadow:0 0 20px rgba(255,215,0,.8)!important;z-index:2;animation:glow 1.2s ease-in-out infinite!important;}
 .cell.wrong{animation:shake .4s ease;}
 .cell:hover{filter:brightness(1.15);}
 .cell-piece{font-size:clamp(1rem,3.5vw,1.6rem);transition:transform .2s;pointer-events:none;line-height:1;display:flex;align-items:center;justify-content:center;}
-
-/* PIECE CARDS */
 .piece-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;width:100%;}
 .piece-card{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);border-radius:18px;padding:1rem .5rem;text-align:center;cursor:pointer;transition:transform .2s,border-color .2s,background .2s;}
 .piece-card.selected{border-color:var(--gold);background:rgba(255,215,0,.15);}
@@ -113,8 +98,6 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .piece-card-role{color:rgba(255,255,255,.5);font-size:.7rem;font-weight:600;}
 .game-instruction{background:rgba(255,255,255,.1);border-radius:16px;padding:.8rem 1.2rem;color:white;font-size:1rem;font-weight:700;text-align:center;border:1px solid rgba(255,255,255,.2);}
 .game-instruction .hl{color:var(--gold);}
-
-/* REWARD */
 #screen-reward{background:linear-gradient(135deg,#1a1a2e,#2d1b69);justify-content:center;padding:2rem;gap:1.5rem;}
 .reward-emoji{font-size:5rem;animation:bounce 1s ease-in-out infinite;}
 .reward-title{font-family:'Fredoka One',cursive;color:var(--gold);font-size:2.5rem;text-align:center;text-shadow:0 0 20px rgba(255,215,0,.5);animation:pop .5s ease;}
@@ -127,8 +110,6 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .badge-name{font-family:'Fredoka One',cursive;color:white;font-size:1.1rem;}
 .badge-desc{color:rgba(255,255,255,.7);font-size:.8rem;font-weight:600;}
 .confetti-piece{position:fixed;width:10px;height:10px;border-radius:2px;animation:confettiFall 1.5s ease-out forwards;pointer-events:none;z-index:999;}
-
-/* DASHBOARD & PRACTICE */
 #screen-dashboard{background:#F8F9FA;padding:0;overflow-y:auto;}
 .dash-header{background:linear-gradient(135deg,#1E1B2E,#2D1B69);padding:1.5rem;color:white;text-align:center;}
 .dash-title{font-family:'Fredoka One',cursive;font-size:1.8rem;color:var(--gold);}
@@ -156,10 +137,7 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 </style>
 </head>
 <body>
-<audio id="bg-music" loop src="bgmusic.mp3" playsinline></audio> 
-
-<audio id="voice-player" playsinline></audio> 
-
+<audio id="bg-music" loop src="bgmusic.mp3" playsinline></audio>
 <button id="mute-btn" class="mute-btn" onclick="toggleMute()">🔊</button>
 <div class="stars-bg" id="stars-bg"></div>
 
@@ -264,28 +242,15 @@ function toggleMute() {
   isMuted = !isMuted;
   document.getElementById('mute-btn').textContent = isMuted ? '🔇' : '🔊';
   const bgMusic = document.getElementById('bg-music');
-  const voicePlayer = document.getElementById('voice-player');
-  
   if (bgMusic) bgMusic.muted = isMuted;
-  if (voicePlayer) {
-    voicePlayer.muted = isMuted;
-    if (isMuted) voicePlayer.pause();
-  }
+  if (isMuted) window.speechSynthesis.cancel();
 }
 
 let audioCtx = null;
 function getAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
 function playTone(freq,dur,type='sine',vol=0.3,delay=0){
-  if (isMuted) return;
-  try{
-    const ctx=getAudio();const o=ctx.createOscillator();const g=ctx.createGain();
-    o.connect(g);g.connect(ctx.destination);
-    o.type=type;o.frequency.setValueAtTime(freq,ctx.currentTime+delay);
-    g.gain.setValueAtTime(0,ctx.currentTime+delay);
-    g.gain.linearRampToValueAtTime(vol,ctx.currentTime+delay+0.02);
-    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+delay+dur);
-    o.start(ctx.currentTime+delay);o.stop(ctx.currentTime+delay+dur+0.05);
-  }catch(e){}
+  if(isMuted)return;
+  try{const ctx=getAudio();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type=type;o.frequency.setValueAtTime(freq,ctx.currentTime+delay);g.gain.setValueAtTime(0,ctx.currentTime+delay);g.gain.linearRampToValueAtTime(vol,ctx.currentTime+delay+0.02);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+delay+dur);o.start(ctx.currentTime+delay);o.stop(ctx.currentTime+delay+dur+0.05);}catch(e){}
 }
 function soundCorrect(){playTone(523,.15,'sine',.25,0);playTone(659,.15,'sine',.25,.1);playTone(784,.25,'sine',.25,.2);}
 function soundWrong(){playTone(300,.1,'sawtooth',.15,0);playTone(250,.2,'sawtooth',.15,.1);}
@@ -295,26 +260,44 @@ function soundClick(){playTone(440,.06,'sine',.15);}
 function soundReveal(){playTone(660,.12,'sine',.2,0);playTone(880,.2,'sine',.2,.1);}
 function soundPlace(){playTone(400,.08,'triangle',.2,0);playTone(600,.12,'sine',.2,.07);}
 
-// ============ TEXT TO SPEECH (Browser - Works Instantly) ============
+// ============ TEXT TO SPEECH (Browser Web Speech API) ============
+let voicesLoaded = false;
+let voicesList = [];
+
+// Load voices — they load async in Chrome
+function loadVoices() {
+  voicesList = window.speechSynthesis.getVoices();
+  if (voicesList.length > 0) voicesLoaded = true;
+}
+window.speechSynthesis.onvoiceschanged = loadVoices;
+loadVoices();
+
+function getBestVoice() {
+  const all = window.speechSynthesis.getVoices();
+  return all.find(v => v.name === 'Google UK English Female')
+    || all.find(v => v.name === 'Samantha')
+    || all.find(v => v.name.includes('Female') && v.lang.startsWith('en'))
+    || all.find(v => v.lang === 'en-GB')
+    || all.find(v => v.lang.startsWith('en-US'))
+    || all[0];
+}
+
 function speakText(text) {
   if (isMuted || !text) return;
   window.speechSynthesis.cancel();
   const bgMusic = document.getElementById('bg-music');
   if (bgMusic && !isMuted) bgMusic.volume = 0.05;
   const utter = new SpeechSynthesisUtterance(text);
-  utter.rate = 0.9;
-  utter.pitch = 1.1;
+  utter.rate = 0.88;
+  utter.pitch = 1.05;
   utter.volume = 1;
-  // Pick best available voice
-  const voices = window.speechSynthesis.getVoices();
-  const preferred = voices.find(v => v.name.includes('Google UK English Female'))
-    || voices.find(v => v.name.includes('Samantha'))
-    || voices.find(v => v.lang === 'en-US' && !v.localService === false)
-    || voices[0];
-  if (preferred) utter.voice = preferred;
+  const voice = getBestVoice();
+  if (voice) utter.voice = voice;
   utter.onend = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; };
+  utter.onerror = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; };
   window.speechSynthesis.speak(utter);
 }
+
 // ============ DATA ============
 const WORLDS=[
   {id:1,name:"Chess Kingdom",emoji:"🏰",color:"linear-gradient(135deg,#8B5CF6,#6D28D9)",desc:"Discover the magical board!",lessons:3,unlocked:true},
@@ -345,7 +328,7 @@ const BADGES=[
   {id:'quiz_wizard',name:'Quiz Wizard',desc:'Got 10 questions right!',emoji:'🧙'},
   {id:'rook_master',name:'Rook Master',desc:'Conquered the Castle Towers!',emoji:'🏯'},
   {id:'bishop_wizard',name:'Bishop Wizard',desc:'Mastered the diagonal magic!',emoji:'🧙'},
-  {id:'queen_commander',name:'Queen Commander',desc:'Unleashed the Queen\'s full power!',emoji:'👸'},
+  {id:'queen_commander',name:'Queen Commander',desc:"Unleashed the Queen's full power!",emoji:'👸'},
   {id:'knight_champion',name:'Knight Champion',desc:'Mastered the L-jump!',emoji:'🐴'},
   {id:'pawn_hero',name:'Pawn Hero',desc:'Led the brave pawn army!',emoji:'⚔️'},
   {id:'king_guardian',name:'King Guardian',desc:'Learned to protect the King!',emoji:'👑'},
@@ -372,11 +355,11 @@ const WORLD3_LESSONS=[
 ];
 const WORLD4_LESSONS=[
   {id:'w4l1',title:'Meet the Queen!',steps:[{type:'story',emoji:'👸',heading:'The Most Powerful Piece!',text:'The QUEEN can move in ANY direction she wants! Like a Rook AND a Bishop combined!',speech:'I am the Queen! No one can stop me!'},{type:'queen-move',heading:'Command the Queen! 👸',instruction:'The Queen can go anywhere — tap a glowing square!',goal:6}]},
-  {id:'w4l2',title:'Queen\'s Hunt!',steps:[{type:'queen-move',heading:'Queen\'s Treasure Hunt! 🎯',instruction:'Guide the Queen on her powerful patrol!',goal:8}]},
+  {id:'w4l2',title:"Queen's Hunt!",steps:[{type:'queen-move',heading:"Queen's Treasure Hunt! 🎯",instruction:'Guide the Queen on her powerful patrol!',goal:8}]},
   {id:'w4l3',title:'Queen Champion!',steps:[{type:'queen-move',heading:'Queen Master! 👸',instruction:'Show your Queen mastery — explore 10 squares!',goal:10}]}
 ];
 const WORLD5_LESSONS=[
-  {id:'w5l1',title:'Meet the Knight!',steps:[{type:'story',emoji:'🐴',heading:'The Jumping Horse!',text:'The KNIGHT jumps in an L-shape! It is the ONLY piece that can jump OVER other pieces!',speech:'I jump in an L — two squares one way, then one sideways!'},{type:'knight-move',heading:'Jump with the Knight! 🐴',instruction:'Tap a glowing square — only the Knight\'s magic L-squares light up!',goal:4}]},
+  {id:'w5l1',title:'Meet the Knight!',steps:[{type:'story',emoji:'🐴',heading:'The Jumping Horse!',text:'The KNIGHT jumps in an L-shape! It is the ONLY piece that can jump OVER other pieces!',speech:'I jump in an L — two squares one way, then one sideways!'},{type:'knight-move',heading:'Jump with the Knight! 🐴',instruction:"Tap a glowing square — only the Knight's magic L-squares light up!",goal:4}]},
   {id:'w5l2',title:'Knight Jump Quest!',steps:[{type:'knight-move',heading:'Knight Jump Quest! ⭐',instruction:'Practice the L-jump — reach 6 different squares!',goal:6}]},
   {id:'w5l3',title:'Knight Champion!',steps:[{type:'knight-move',heading:'Knight Master! 🏇',instruction:'Master the L-jump — reach 8 squares!',goal:8}]}
 ];
@@ -397,7 +380,7 @@ const WORLD8_LESSONS=[
 ];
 const WORLD9_LESSONS=[
   {id:'w9l1',title:'Your First Game!',steps:[{type:'mini-game-quiz',heading:'Champion Quiz! 🏆',questions:[{q:'Which piece moves in an L-shape?',opts:['Rook','Knight','Bishop','Queen'],correct:1,praise:'Knight!'},{q:'Which piece is most important?',opts:['Queen','Bishop','King','Rook'],correct:2,praise:'The King!'}]}]},
-  {id:'w9l2',title:'Chess Champion!',steps:[{type:'champion-board',heading:'The Champion\'s Challenge! 🏆',instruction:'Make 3 strong chess moves to prove you are a Champion!',goal:3}]},
+  {id:'w9l2',title:'Chess Champion!',steps:[{type:'champion-board',heading:"The Champion's Challenge! 🏆",instruction:'Make 3 strong chess moves to prove you are a Champion!',goal:3}]},
   {id:'w9l3',title:'Grand Champion!',steps:[{type:'story',emoji:'🌈',heading:'CHESS KINGDOM COMPLETE!',text:'YOU DID IT! You have conquered all 9 worlds of the Chess Kingdom!',speech:'All hail the Chess Champion!'}]}
 ];
 
@@ -414,8 +397,8 @@ let state={
   practiceRounds:0,practiceCorrect:0,totalQuizCorrect:0,
   currentWorld:null,currentLesson:null,currentStep:0,
   piecesDiscovered:[],lightedSquares:0,placedPawns:0,
-  practiceMode:false, moveGame:null, rookCapture:null, pawnGame:null, pawnCapture:null,
-  pawnPromote:null, kingGame:null, safeGame:null, centreGame:null, openingGame:null, treasureCapture:null, championGame:null, mqQuiz:null
+  practiceMode:false,moveGame:null,rookCapture:null,pawnGame:null,pawnCapture:null,
+  pawnPromote:null,kingGame:null,safeGame:null,centreGame:null,openingGame:null,treasureCapture:null,championGame:null,mqQuiz:null
 };
 
 // ============ HELPERS ============
@@ -430,32 +413,24 @@ function launchConfetti(){const colors=['#FFD700','#FF6B6B','#4ECDC4','#A855F7',
 function startJourney(){
   const name=$('hero-name-input').value.trim()||'Hero';
   state.heroName=name;
-  
-  // UNLOCK SAFARI AUDIO TRAP
-  const voicePlayer = document.getElementById('voice-player');
-  if (voicePlayer) {
-    voicePlayer.volume = 0.01; 
-    voicePlayer.play().catch(e => {}); 
-  }
-
-  const bgMusic = document.getElementById('bg-music');
-  if (bgMusic && !isMuted) {
-    bgMusic.volume = 0.15; 
-    bgMusic.play().catch(e => {});
-  }
-  
+  // Unlock audio context on user gesture
+  if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume();
+  const bgMusic=document.getElementById('bg-music');
+  if(bgMusic&&!isMuted){bgMusic.volume=0.15;bgMusic.play().catch(e=>{});}
   soundFanfare();
   updateHomeUI();renderWorlds();showScreen('screen-home');
 }
+
 function showHome(){
-  const voicePlayer = document.getElementById('voice-player');
-  if (voicePlayer) voicePlayer.pause();
+  window.speechSynthesis.cancel();
   updateHomeUI();renderWorlds();showScreen('screen-home');
 }
 
 function updateHomeUI(){
-  $('home-hero-name').textContent=state.heroName;$('home-stars').textContent=state.stars;
-  $('home-coins').textContent=state.coins;$('home-streak').textContent=state.streak;
+  $('home-hero-name').textContent=state.heroName;
+  $('home-stars').textContent=state.stars;
+  $('home-coins').textContent=state.coins;
+  $('home-streak').textContent=state.streak;
   const ti=Math.min(Math.floor(state.xp/100),TITLES.length-1);
   $('home-hero-title').textContent=TITLES[ti];
   $('home-avatar').textContent=ti>=4?'👑':ti>=3?'⚔️':ti>=2?'🛡️':'♟️';
@@ -467,7 +442,7 @@ function renderWorlds(){
   if(anyProgress){
     const pb=document.createElement('div');pb.className='practice-banner';
     pb.innerHTML=`<div class="practice-title">🔁 Practice Mode!</div><div class="practice-sub">Drill your skills — ${state.practiceRounds} rounds done!</div><span class="practice-emoji">⭐</span>`;
-    pb.addEventListener('click', ()=>{soundClick();startPractice();});
+    pb.addEventListener('click',()=>{soundClick();startPractice();});
     container.appendChild(pb);
   }
   WORLDS.forEach(w=>{
@@ -477,7 +452,7 @@ function renderWorlds(){
     const card=document.createElement('div');
     card.className='world-card '+(unlocked?'unlocked':'locked');card.style.background=w.color;
     card.innerHTML=`<div class="world-num">World ${w.id}</div><div class="world-name">${w.name}</div><div class="world-desc">${w.desc}</div>${unlocked?`<div class="world-progress"><div class="world-progress-fill" style="width:${pct}%"></div></div><div class="stars-row">${[0,1,2].map(i=>`<span>${i<done?'⭐':'☆'}</span>`).join('')}</div><span class="world-emoji">${w.emoji}</span>`:`<span class="lock-icon">🔒</span>`}`;
-    if(unlocked) card.addEventListener('click', ()=>{soundClick();startWorld(w.id);});
+    if(unlocked) card.addEventListener('click',()=>{soundClick();startWorld(w.id);});
     container.appendChild(card);
   });
 }
@@ -486,12 +461,8 @@ function startWorld(worldId){
   state.currentWorld=worldId;
   const allLessons={1:WORLD1_LESSONS,2:WORLD2_LESSONS,3:WORLD3_LESSONS,4:WORLD4_LESSONS,5:WORLD5_LESSONS,6:WORLD6_LESSONS,7:WORLD7_LESSONS,8:WORLD8_LESSONS,9:WORLD9_LESSONS};
   const lessons=allLessons[worldId];
-  if(lessons){
-    const idx=Math.min(state.worldProgress[worldId]||0,lessons.length-1);
-    startLesson(lessons[idx]);
-  } else {
-    showComingSoon(worldId);
-  }
+  if(lessons){const idx=Math.min(state.worldProgress[worldId]||0,lessons.length-1);startLesson(lessons[idx]);}
+  else showComingSoon(worldId);
 }
 
 function showComingSoon(worldId){
@@ -520,7 +491,6 @@ function renderStep(){
   const lesson=state.currentLesson;const step=lesson.steps[state.currentStep];
   $('lesson-progress-bar').style.width=Math.round((state.currentStep/lesson.steps.length)*100)+'%';
   const content=$('lesson-content');content.innerHTML='';
-  
   if(step.type==='story')renderStory(step,content);
   else if(step.type==='board-explore')renderBoardExplore(step,content);
   else if(step.type==='board-place')renderBoardPlace(step,content);
@@ -543,26 +513,18 @@ function renderStep(){
   else if(step.type==='champion-board')renderChampionBoard(step,content);
   else if(step.type==='mini-game-quiz')renderMiniGameQuiz(step,content);
 
-  // AUTOMATIC NARRATOR FOR ALL SCREENS
-  setTimeout(() => {
-    let textToSpeak = '';
-    if (step.type === 'story') {
-      textToSpeak = step.text + (step.speech ? ' ' + step.speech : '');
-    } else if (step.instruction && step.type !== 'piece-match') {
-      textToSpeak = step.instruction;
-    } else if (step.question) {
-      textToSpeak = step.question;
-    }
-    
-    if (textToSpeak) {
-      speakText(textToSpeak);
-    }
-  }, 1500);
+  // Narrator — speaks the key text for each screen
+  setTimeout(()=>{
+    let textToSpeak='';
+    if(step.type==='story') textToSpeak=step.text+(step.speech?' '+step.speech:'');
+    else if(step.instruction&&step.type!=='piece-match') textToSpeak=step.instruction;
+    else if(step.question) textToSpeak=step.question;
+    if(textToSpeak) speakText(textToSpeak);
+  },600);
 }
 
 function nextStep(){
-  const voicePlayer = document.getElementById('voice-player');
-  if (voicePlayer) voicePlayer.pause();
+  window.speechSynthesis.cancel();
   soundClick();state.currentStep++;
   if(state.currentStep>=state.currentLesson.steps.length){
     if(state.practiceMode) completePractice(); else completeLesson();
@@ -570,15 +532,7 @@ function nextStep(){
 }
 
 function renderStory(step,content){
-  content.innerHTML=`
-    <div class="lesson-card">
-      <span class="lesson-emoji">${step.emoji}</span>
-      <div class="lesson-heading">${step.heading}</div>
-      <div class="lesson-text">${step.text}</div>
-      ${step.speech?`<div class="lesson-speech">${step.speech}</div>`:''}
-    </div>
-    <button class="btn-next" style="margin-top:15px;" onclick="soundClick();nextStep()">✨ Next!</button>
-  `;
+  content.innerHTML=`<div class="lesson-card"><span class="lesson-emoji">${step.emoji}</span><div class="lesson-heading">${step.heading}</div><div class="lesson-text">${step.text}</div>${step.speech?`<div class="lesson-speech">${step.speech}</div>`:''}</div><button class="btn-next" style="margin-top:15px;" onclick="soundClick();nextStep()">✨ Next!</button>`;
 }
 
 function buildBoard(targets){
@@ -590,7 +544,6 @@ function buildBoard(targets){
   html+='</div>';return html;
 }
 
-// ==== RENDER GAMES ====
 function renderBoardExplore(step,content){
   state.lightedSquares=0;
   content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="game-instruction">${step.instruction} <span class="hl">(<span id="sq-count">0</span>/${step.goal} lit up!)</span></div></div><div class="board-wrap">${buildBoard(null)}</div><div id="explore-next" style="display:none"><button class="btn-next" onclick="nextStep()">🌟 Amazing! Next!</button></div>`;
@@ -626,7 +579,7 @@ function renderPieceMatch(step,content){
   let grid='<div class="piece-grid" style="grid-template-columns:repeat(2,1fr)">';
   options.forEach(p=>{grid+=`<div class="piece-card" onclick="checkMatch('${p.name}','${piece.name}',this)"><span class="piece-card-emoji">${p.emoji}</span><div class="piece-card-name">${p.name}</div><div class="piece-card-role">${p.role}</div></div>`;});grid+='</div>';
   content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="lesson-speech" style="font-size:1rem;margin-top:.5rem">${clue}</div></div>${grid}<div id="match-next" style="display:none"><button class="btn-next" onclick="nextStep()">🌟 Next!</button></div>`;
-  setTimeout(() => speakText(clue), 400); 
+  setTimeout(()=>speakText(clue),600);
 }
 
 function checkMatch(chosen,correct,el){
@@ -635,7 +588,7 @@ function checkMatch(chosen,correct,el){
 }
 
 function renderQuiz(step,content){
-  let opts='';step.options.forEach((o,i)=>{opts+=`<div class="piece-card" style="grid-column:span 1;padding:.8rem;" onclick="checkQuiz(${i},${step.correct},this,'${(step.praise||'').replace(/'/g,'\\\'')}')"><div class="piece-card-name" style="font-size:1rem">${o}</div></div>`;});
+  let opts='';step.options.forEach((o,i)=>{opts+=`<div class="piece-card" style="grid-column:span 1;padding:.8rem;" onclick="checkQuiz(${i},${step.correct},this,'${(step.praise||'').replace(/'/g,"\\'")}')"><div class="piece-card-name" style="font-size:1rem">${o}</div></div>`;});
   content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="lesson-speech" style="font-size:1rem;margin-top:.5rem">${step.question}</div></div><div class="piece-grid" style="grid-template-columns:repeat(2,1fr)">${opts}</div><div id="quiz-next" style="display:none"><button class="btn-next" onclick="nextStep()">✅ Next!</button></div>`;
 }
 
@@ -925,7 +878,7 @@ function renderMQQuestion(content){
   const q=mq.questions[mq.idx];let opts='';
   q.opts.forEach((o,i)=>{opts+=`<div class="piece-card" style="padding:.8rem" onclick="answerMQ(${i},${q.correct},'${(q.praise||'').replace(/'/g,"\\'")}')"><div class="piece-card-name" style="font-size:1rem">${o}</div></div>`;});
   content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">Question ${mq.idx+1} of ${mq.questions.length}!</div><div class="lesson-speech" style="font-size:1rem;margin-top:.5rem">${q.q}</div></div><div class="piece-grid" style="grid-template-columns:repeat(2,1fr)">${opts}</div>`;
-  setTimeout(() => speakText(q.q), 400);
+  setTimeout(()=>speakText(q.q),600);
 }
 
 function answerMQ(chosen,correct,praise){
@@ -937,7 +890,7 @@ function answerMQ(chosen,correct,praise){
   }
 }
 
-// ==== REWARD & PROGRESS ====
+// ============ REWARD & PROGRESS ============
 function completePractice(){
   state.practiceRounds++;state.stars+=1;state.xp+=20;addCoins(10);
   if(state.practiceRounds>=5&&!state.earnedBadges.includes('practice_hero'))state.earnedBadges.push('practice_hero');
