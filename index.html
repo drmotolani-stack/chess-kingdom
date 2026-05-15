@@ -295,88 +295,25 @@ function soundClick(){playTone(440,.06,'sine',.15);}
 function soundReveal(){playTone(660,.12,'sine',.2,0);playTone(880,.2,'sine',.2,.1);}
 function soundPlace(){playTone(400,.08,'triangle',.2,0);playTone(600,.12,'sine',.2,.07);}
 
-// ============ TEXT TO SPEECH (Gemini AI Studio) ============
-async function speakText(text) {
+// ============ TEXT TO SPEECH (Browser - Works Instantly) ============
+function speakText(text) {
   if (isMuted || !text) return;
-
-  const voicePlayer = document.getElementById('voice-player');
+  window.speechSynthesis.cancel();
   const bgMusic = document.getElementById('bg-music');
-
-  if (voicePlayer && !voicePlayer.paused) voicePlayer.pause();
   if (bgMusic && !isMuted) bgMusic.volume = 0.05;
-
-  const GEMINI_KEY = 'AIzaSyCQPIXX_GV2fQ5xdMr31v3uCzle0bgHc4Q';
-  const VOICE_NAME = 'Zephyr';
-
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent?key=${GEMINI_KEY}`;
-
-  const payload = {
-    contents: [{ role: "user", parts: [{ text }] }],
-    generationConfig: {
-      responseModalities: ["AUDIO"],
-      speechConfig: {
-        voiceConfig: {
-          prebuiltVoiceConfig: { voiceName: VOICE_NAME }
-        }
-      }
-    }
-  };
-
-  try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    const part = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData;
-    
-    if (part?.data) {
-      // Convert PCM to WAV so the browser can play it
-      const pcmBuffer = Uint8Array.from(atob(part.data), c => c.charCodeAt(0));
-      const wavBuffer = pcmToWav(pcmBuffer, 24000, 1, 16);
-      const blob = new Blob([wavBuffer], { type: 'audio/wav' });
-      const audioUrl = URL.createObjectURL(blob);
-      voicePlayer.src = audioUrl;
-      voicePlayer.onended = () => {
-        URL.revokeObjectURL(audioUrl);
-        if (bgMusic && !isMuted) bgMusic.volume = 0.15;
-      };
-      voicePlayer.play().catch(e => console.log('Voice autoplay blocked', e));
-    } else {
-      console.warn('Gemini TTS: no audio in response', data);
-      if (bgMusic && !isMuted) bgMusic.volume = 0.15;
-    }
-  } catch (err) {
-    console.error('Gemini TTS error:', err);
-    if (bgMusic && !isMuted) bgMusic.volume = 0.15;
-  }
-}
-
-// Converts raw PCM to WAV format so the browser can play it
-function pcmToWav(pcmData, sampleRate, numChannels, bitDepth) {
-  const bytesPerSample = bitDepth / 8;
-  const blockAlign = numChannels * bytesPerSample;
-  const byteRate = sampleRate * blockAlign;
-  const dataSize = pcmData.length;
-  const buffer = new ArrayBuffer(44 + dataSize);
-  const view = new DataView(buffer);
-  const write = (offset, str) => { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)); };
-  write(0, 'RIFF');
-  view.setUint32(4, 36 + dataSize, true);
-  write(8, 'WAVE');
-  write(12, 'fmt ');
-  view.setUint32(16, 16, true);
-  view.setUint16(20, 1, true);
-  view.setUint16(22, numChannels, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, byteRate, true);
-  view.setUint16(32, blockAlign, true);
-  view.setUint16(34, bitDepth, true);
-  write(36, 'data');
-  view.setUint32(40, dataSize, true);
-  new Uint8Array(buffer, 44).set(pcmData);
-  return buffer;
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.rate = 0.9;
+  utter.pitch = 1.1;
+  utter.volume = 1;
+  // Pick best available voice
+  const voices = window.speechSynthesis.getVoices();
+  const preferred = voices.find(v => v.name.includes('Google UK English Female'))
+    || voices.find(v => v.name.includes('Samantha'))
+    || voices.find(v => v.lang === 'en-US' && !v.localService === false)
+    || voices[0];
+  if (preferred) utter.voice = preferred;
+  utter.onend = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; };
+  window.speechSynthesis.speak(utter);
 }
 // ============ DATA ============
 const WORLDS=[
