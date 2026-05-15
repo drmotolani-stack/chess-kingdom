@@ -151,6 +151,7 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 </style>
 </head>
 <body>
+ <audio id="bg-music" loop src="bgmusic.mp3"></audio> 
 <div class="stars-bg" id="stars-bg"></div>
 
 <div id="screen-name" class="screen active">
@@ -397,7 +398,13 @@ function showMiniCelebration(msg){const el=document.createElement('div');el.styl
 function launchConfetti(){const colors=['#FFD700','#FF6B6B','#4ECDC4','#A855F7','#3B82F6','#10B981'];for(let i=0;i<40;i++){const el=document.createElement('div');el.className='confetti-piece';el.style.cssText=`left:${20+Math.random()*60}%;top:${Math.random()*30}%;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'2px'};animation-delay:${Math.random()*.5}s;animation-duration:${1+Math.random()}s`;document.body.appendChild(el);setTimeout(()=>el.remove(),2000);}}
 
 // ============ NAVIGATION ============
-function startJourney(){const name=$('hero-name-input').value.trim()||'Hero';state.heroName=name;soundFanfare();updateHomeUI();renderWorlds();showScreen('screen-home');}
+function startJourney(){
+  const name=$('hero-name-input').value.trim()||'Hero';
+  state.heroName=name;
+  document.getElementById('bg-music').play(); // <--- THIS STARTS THE MUSIC
+  soundFanfare();
+  updateHomeUI();renderWorlds();showScreen('screen-home');
+}
 function showHome(){updateHomeUI();renderWorlds();showScreen('screen-home');}
 
 function updateHomeUI(){
