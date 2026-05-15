@@ -156,7 +156,10 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 </style>
 </head>
 <body>
-<audio id="bg-music" loop src="bgmusic.mp3"></audio> 
+<audio id="bg-music" loop src="bgmusic.mp3" playsinline></audio> 
+
+<audio id="voice-player" playsinline></audio> 
+
 <button id="mute-btn" class="mute-btn" onclick="toggleMute()">🔊</button>
 <div class="stars-bg" id="stars-bg"></div>
 
@@ -256,25 +259,18 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 <script>
 // ============ AUDIO ENGINE ============
 let isMuted = false;
-let currentAudio = null;
 
 function toggleMute() {
   isMuted = !isMuted;
   document.getElementById('mute-btn').textContent = isMuted ? '🔇' : '🔊';
   const bgMusic = document.getElementById('bg-music');
-  if (bgMusic) {
-    if (isMuted) {
-      bgMusic.muted = true;
-    } else {
-      bgMusic.muted = false;
-      let p = bgMusic.play();
-      if (p !== undefined) p.catch(e => console.log(e));
-    }
+  const voicePlayer = document.getElementById('voice-player');
+  
+  if (bgMusic) bgMusic.muted = isMuted;
+  if (voicePlayer) {
+    voicePlayer.muted = isMuted;
+    if (isMuted) voicePlayer.pause();
   }
-  if (isMuted && currentAudio) {
-    currentAudio.pause();
-  }
-  if (isMuted && window.speechSynthesis) window.speechSynthesis.cancel();
 }
 
 let audioCtx = null;
@@ -299,32 +295,26 @@ function soundClick(){playTone(440,.06,'sine',.15);}
 function soundReveal(){playTone(660,.12,'sine',.2,0);playTone(880,.2,'sine',.2,.1);}
 function soundPlace(){playTone(400,.08,'triangle',.2,0);playTone(600,.12,'sine',.2,.07);}
 
-// ============ TEXT TO SPEECH (Gemini AI Studio) ============
+// ============ TEXT TO SPEECH (Google Cloud Journey Voice) ============
 async function speakText(text) {
   if (isMuted || !text) return;
   
-  if (currentAudio) {
-    currentAudio.pause();
-  }
-
+  const voicePlayer = document.getElementById('voice-player');
   const bgMusic = document.getElementById('bg-music');
+  
+  if (voicePlayer && !voicePlayer.paused) {
+    voicePlayer.pause();
+  }
   if (bgMusic && !isMuted) bgMusic.volume = 0.05; 
 
-  const apiKey = 'AIzaSyC4eljzyU6v_z3N7p8Rg6ZkdnPFLK4KBSw'; 
+  // --- PASTE YOUR FIRST GOOGLE CLOUD API KEY HERE ---
+  const apiKey = 'AIzaSyANiUVdIrnK6P2QZrED9w6PPXBa0t6S1PA'; 
   
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent?key=${apiKey}`;
+  const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
   const payload = {
-    contents: [{ parts: [{ text: text }] }],
-    generationConfig: {
-      responseModalities: ["AUDIO"],
-      speechConfig: {
-        voiceConfig: {
-          prebuiltVoiceConfig: {
-            voiceName: "Enceladus" 
-          }
-        }
-      }
-    }
+    input: { text: text },
+    voice: { languageCode: 'en-US', name: 'en-US-Journey-D' }, 
+    audioConfig: { audioEncoding: 'MP3' }
   };
 
   try {
@@ -334,13 +324,11 @@ async function speakText(text) {
       body: JSON.stringify(payload)
     });
     const data = await response.json();
-    if (data.candidates && data.candidates[0].content.parts[0].inlineData) {
-      const audioBase64 = data.candidates[0].content.parts[0].inlineData.data;
-      const mimeType = data.candidates[0].content.parts[0].inlineData.mimeType || 'audio/wav';
-      currentAudio = new Audio(`data:${mimeType};base64,${audioBase64}`);
-      currentAudio.onended = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; }; 
-      let p = currentAudio.play();
-      if (p !== undefined) p.catch(e => console.log(e));
+    
+    if (data.audioContent) {
+      voicePlayer.src = 'data:audio/mp3;base64,' + data.audioContent;
+      voicePlayer.onended = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; }; 
+      voicePlayer.play().catch(e => console.log("Voice autoplay prevented", e));
     } else {
       if (bgMusic && !isMuted) bgMusic.volume = 0.15;
     }
@@ -391,7 +379,7 @@ const TITLES=['Pawn Explorer','Knight Jumper','Castle Defender','Bishop Seeker',
 
 // ============ LESSON DATA ============
 const WORLD1_LESSONS=[
-  {id:'w1l1',title:'The Magical Board',steps:[{type:'story',emoji:'🏰',heading:'Welcome to Chess Kingdom!',text:'Welcome to Chess Kingdom!',speech:'[whispers] A long time ago, in a magical kingdom far away... two armies faced each other on a great battle board! [laughs] Every square on this board is a magical land... where our heroes live!'},{type:'board-explore',heading:'Touch the Magic Board!',instruction:'Tap any square on the board to light it up!',goal:5},{type:'quiz',heading:'Quick Question! 🧠',question:'How many squares are on a chess board?',options:['32','64','100','48'],correct:1,praise:'Yes! 64 squares — 8 rows of 8! You are SO smart!'}]},
+  {id:'w1l1',title:'The Magical Board',steps:[{type:'story',emoji:'🏰',heading:'Welcome to Chess Kingdom!',text:'A long time ago, in a magical kingdom far away... two armies faced each other on a great battle board!',speech:'Every square on this board is a magical land... where our heroes live!'},{type:'board-explore',heading:'Touch the Magic Board!',instruction:'Tap any square on the board to light it up!',goal:5},{type:'quiz',heading:'Quick Question! 🧠',question:'How many squares are on a chess board?',options:['32','64','100','48'],correct:1,praise:'Yes! 64 squares — 8 rows of 8! You are SO smart!'}]},
   {id:'w1l2',title:'Meet the Chess Heroes!',steps:[{type:'piece-parade',heading:'The Chess Heroes!',instruction:'Tap each hero to meet them!'},{type:'piece-match',heading:'Who Am I? 🎭',instruction:'Read the clue and find the right hero!'}]},
   {id:'w1l3',title:'Set Up the Kingdom!',steps:[{type:'board-place',heading:'Place the Pawns!',instruction:'Tap the glowing squares to place your brave soldiers!'},{type:'story',emoji:'🌟',heading:'World 1 Complete!',text:'You have explored the Chess Kingdom! You know the board, you know the heroes, and you placed the pawn army!'}]}
 ];
@@ -466,20 +454,25 @@ function startJourney(){
   const name=$('hero-name-input').value.trim()||'Hero';
   state.heroName=name;
   
+  // UNLOCK SAFARI AUDIO TRAP
+  const voicePlayer = document.getElementById('voice-player');
+  if (voicePlayer) {
+    voicePlayer.volume = 0.01; 
+    voicePlayer.play().catch(e => {}); 
+  }
+
   const bgMusic = document.getElementById('bg-music');
   if (bgMusic && !isMuted) {
     bgMusic.volume = 0.15; 
-    let p = bgMusic.play();
-    if (p !== undefined) {
-      p.catch(e => console.log("Audio autoplay prevented by browser", e));
-    }
+    bgMusic.play().catch(e => {});
   }
   
   soundFanfare();
   updateHomeUI();renderWorlds();showScreen('screen-home');
 }
 function showHome(){
-  if (currentAudio) currentAudio.pause();
+  const voicePlayer = document.getElementById('voice-player');
+  if (voicePlayer) voicePlayer.pause();
   updateHomeUI();renderWorlds();showScreen('screen-home');
 }
 
@@ -573,7 +566,7 @@ function renderStep(){
   else if(step.type==='champion-board')renderChampionBoard(step,content);
   else if(step.type==='mini-game-quiz')renderMiniGameQuiz(step,content);
 
-  // AUTOMATIC NARRATOR FOR ALL SCREENS EXCEPT CUSTOM ONES
+  // AUTOMATIC NARRATOR FOR ALL SCREENS
   setTimeout(() => {
     let textToSpeak = '';
     if (step.type === 'story') {
@@ -591,7 +584,8 @@ function renderStep(){
 }
 
 function nextStep(){
-  if (currentAudio) currentAudio.pause();
+  const voicePlayer = document.getElementById('voice-player');
+  if (voicePlayer) voicePlayer.pause();
   soundClick();state.currentStep++;
   if(state.currentStep>=state.currentLesson.steps.length){
     if(state.practiceMode) completePractice(); else completeLesson();
@@ -604,7 +598,7 @@ function renderStory(step,content){
       <span class="lesson-emoji">${step.emoji}</span>
       <div class="lesson-heading">${step.heading}</div>
       <div class="lesson-text">${step.text}</div>
-      ${step.speech?`<div class="lesson-speech">${step.speech.replace(/\[.*?\]/g, '')}</div>`:''}
+      ${step.speech?`<div class="lesson-speech">${step.speech}</div>`:''}
     </div>
     <button class="btn-next" style="margin-top:15px;" onclick="soundClick();nextStep()">✨ Next!</button>
   `;
@@ -655,7 +649,7 @@ function renderPieceMatch(step,content){
   let grid='<div class="piece-grid" style="grid-template-columns:repeat(2,1fr)">';
   options.forEach(p=>{grid+=`<div class="piece-card" onclick="checkMatch('${p.name}','${piece.name}',this)"><span class="piece-card-emoji">${p.emoji}</span><div class="piece-card-name">${p.name}</div><div class="piece-card-role">${p.role}</div></div>`;});grid+='</div>';
   content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="lesson-speech" style="font-size:1rem;margin-top:.5rem">${clue}</div></div>${grid}<div id="match-next" style="display:none"><button class="btn-next" onclick="nextStep()">🌟 Next!</button></div>`;
-  setTimeout(() => speakText(clue), 400); // Reads the dynamic clue directly
+  setTimeout(() => speakText(clue), 400); 
 }
 
 function checkMatch(chosen,correct,el){
@@ -954,7 +948,7 @@ function renderMQQuestion(content){
   const q=mq.questions[mq.idx];let opts='';
   q.opts.forEach((o,i)=>{opts+=`<div class="piece-card" style="padding:.8rem" onclick="answerMQ(${i},${q.correct},'${(q.praise||'').replace(/'/g,"\\'")}')"><div class="piece-card-name" style="font-size:1rem">${o}</div></div>`;});
   content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">Question ${mq.idx+1} of ${mq.questions.length}!</div><div class="lesson-speech" style="font-size:1rem;margin-top:.5rem">${q.q}</div></div><div class="piece-grid" style="grid-template-columns:repeat(2,1fr)">${opts}</div>`;
-  setTimeout(() => speakText(q.q), 400); // Reads the mini-game quiz question
+  setTimeout(() => speakText(q.q), 400);
 }
 
 function answerMQ(chosen,correct,praise){
