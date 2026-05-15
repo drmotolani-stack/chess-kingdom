@@ -148,10 +148,13 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .practice-title{font-family:'Fredoka One',cursive;font-size:1.4rem;color:white;text-shadow:1px 1px 0 rgba(0,0,0,.2);}
 .practice-sub{color:rgba(255,255,255,.85);font-size:.85rem;font-weight:600;margin-top:.2rem;}
 .practice-emoji{font-size:2.2rem;position:absolute;right:1.2rem;top:50%;transform:translateY(-50%);}
+.mute-btn { position:fixed; top:15px; right:15px; background:rgba(0,0,0,0.3); border:2px solid var(--gold); border-radius:50%; width:45px; height:45px; font-size:1.4rem; cursor:pointer; z-index:1000; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2); transition:transform 0.1s; }
+.mute-btn:active { transform:scale(0.9); }
 </style>
 </head>
 <body>
 <audio id="bg-music" loop src="bgmusic.mp3"></audio> 
+<button id="mute-btn" class="mute-btn" onclick="toggleMute()">🔊</button>  
 <div class="stars-bg" id="stars-bg"></div>
 
 <div id="screen-name" class="screen active">
@@ -248,10 +251,19 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 </div>
 
 <script>
+let isMuted = false;
+function toggleMute() {
+  isMuted = !isMuted;
+  document.getElementById('mute-btn').textContent = isMuted ? '🔇' : '🔊';
+  const bgMusic = document.getElementById('bg-music');
+  if (bgMusic) bgMusic.muted = isMuted;
+  if (isMuted && window.speechSynthesis) window.speechSynthesis.cancel();
+}
 // ============ AUDIO ENGINE ============
 let audioCtx = null;
 function getAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
 function playTone(freq,dur,type='sine',vol=0.3,delay=0){
+  if(isMuted) return;
   try{
     const ctx=getAudio();const o=ctx.createOscillator();const g=ctx.createGain();
     o.connect(g);g.connect(ctx.destination);
@@ -273,6 +285,8 @@ function soundPlace(){playTone(400,.08,'triangle',.2,0);playTone(600,.12,'sine',
 // ============ VOICE HUNTER (Zero-Cost Premium Audio) ============
 if('speechSynthesis' in window) window.speechSynthesis.getVoices(); 
 function speakText(text) {
+  if(isMuted) return;
+  if ('speechSynthesis' in window) {
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel(); 
     const utterance = new SpeechSynthesisUtterance(text);
