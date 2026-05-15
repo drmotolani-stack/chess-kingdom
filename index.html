@@ -156,7 +156,7 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 </style>
 </head>
 <body>
-<audio id="bg-music" loop src="bgmusic.mp3" preload="auto" playsinline></audio> 
+<audio id="bg-music" loop src="bgmusic.mp3"></audio> 
 <button id="mute-btn" class="mute-btn" onclick="toggleMute()">🔊</button>
 <div class="stars-bg" id="stars-bg"></div>
 
@@ -254,8 +254,10 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 </div>
 
 <script>
-// ============ AUDIO ENGINE & MUTE LOGIC ============
+// ============ AUDIO ENGINE ============
 let isMuted = false;
+let currentAudio = null;
+
 function toggleMute() {
   isMuted = !isMuted;
   document.getElementById('mute-btn').textContent = isMuted ? '🔇' : '🔊';
@@ -269,13 +271,16 @@ function toggleMute() {
       if (p !== undefined) p.catch(e => console.log(e));
     }
   }
+  if (isMuted && currentAudio) {
+    currentAudio.pause();
+  }
   if (isMuted && window.speechSynthesis) window.speechSynthesis.cancel();
 }
 
 let audioCtx = null;
 function getAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
 function playTone(freq,dur,type='sine',vol=0.3,delay=0){
-  if(isMuted) return;
+  if (isMuted) return;
   try{
     const ctx=getAudio();const o=ctx.createOscillator();const g=ctx.createGain();
     o.connect(g);g.connect(ctx.destination);
@@ -298,28 +303,15 @@ function soundPlace(){playTone(400,.08,'triangle',.2,0);playTone(600,.12,'sine',
 async function speakText(text) {
   if (isMuted) return;
   
+  if (currentAudio) {
+    currentAudio.pause();
+  }
+
   const bgMusic = document.getElementById('bg-music');
   if (bgMusic && !isMuted) bgMusic.volume = 0.05; 
 
-  // Paste your new Gemini key here!
   const apiKey = 'AIzaSyC4eljzyU6v_z3N7p8Rg6ZkdnPFLK4KBSw'; 
   
-  if (apiKey === 'AIzaSyC4eljzyU6v_z3N7p8Rg6ZkdnPFLK4KBSw' || apiKey === '') {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel(); 
-      const utterance = new SpeechSynthesisUtterance(text);
-      const voices = window.speechSynthesis.getVoices();
-      const preferred = voices.find(v => v.name.includes('Alex') || v.name.includes('Arthur') || v.name.includes('Daniel') || v.name.includes('Premium'));
-      if (preferred) utterance.voice = preferred;
-      utterance.rate = 0.9; 
-      utterance.pitch = 0.8; 
-      utterance.onend = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; };
-      window.speechSynthesis.speak(utterance);
-    }
-    return;
-  }
-
-  // Gemini 3.1 Flash TTS Logic
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent?key=${apiKey}`;
   const payload = {
     contents: [{ parts: [{ text: text }] }],
@@ -328,7 +320,6 @@ async function speakText(text) {
       speechConfig: {
         voiceConfig: {
           prebuiltVoiceConfig: {
-            // Using Enceladus for that breathy, hushed storyteller vibe
             voiceName: "Enceladus" 
           }
         }
@@ -346,9 +337,9 @@ async function speakText(text) {
     if (data.candidates && data.candidates[0].content.parts[0].inlineData) {
       const audioBase64 = data.candidates[0].content.parts[0].inlineData.data;
       const mimeType = data.candidates[0].content.parts[0].inlineData.mimeType || 'audio/wav';
-      const audio = new Audio(`data:${mimeType};base64,${audioBase64}`);
-      audio.onended = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; }; 
-      let p = audio.play();
+      currentAudio = new Audio(`data:${mimeType};base64,${audioBase64}`);
+      currentAudio.onended = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; }; 
+      let p = currentAudio.play();
       if (p !== undefined) p.catch(e => console.log(e));
     } else {
       if (bgMusic && !isMuted) bgMusic.volume = 0.15;
@@ -400,7 +391,7 @@ const TITLES=['Pawn Explorer','Knight Jumper','Castle Defender','Bishop Seeker',
 
 // ============ LESSON DATA ============
 const WORLD1_LESSONS=[
-  {id:'w1l1',title:'The Magical Board',steps:[{type:'story',emoji:'🏰',heading:'Welcome to Chess Kingdom!',text:'A long time ago, in a magical kingdom far away... two armies faced each other on a great battle board!',speech:'Every square on this board is a magical land where our heroes live!'},{type:'board-explore',heading:'Touch the Magic Board!',instruction:'Tap any square on the board to light it up!',goal:5},{type:'quiz',heading:'Quick Question! 🧠',question:'How many squares are on a chess board?',options:['32','64','100','48'],correct:1,praise:'Yes! 64 squares — 8 rows of 8! You are SO smart!'}]},
+  {id:'w1l1',title:'The Magical Board',steps:[{type:'story',emoji:'🏰',heading:'Welcome to Chess Kingdom!',text:'A long time ago, in a magical kingdom far away... two armies faced each other on a great battle board!',speech:'[whispers] Every square on this board is a magical land... [laughs] where our heroes live!'},{type:'board-explore',heading:'Touch the Magic Board!',instruction:'Tap any square on the board to light it up!',goal:5},{type:'quiz',heading:'Quick Question! 🧠',question:'How many squares are on a chess board?',options:['32','64','100','48'],correct:1,praise:'Yes! 64 squares — 8 rows of 8! You are SO smart!'}]},
   {id:'w1l2',title:'Meet the Chess Heroes!',steps:[{type:'piece-parade',heading:'The Chess Heroes!',instruction:'Tap each hero to meet them!'},{type:'piece-match',heading:'Who Am I? 🎭',instruction:'Read the clue and find the right hero!'}]},
   {id:'w1l3',title:'Set Up the Kingdom!',steps:[{type:'board-place',heading:'Place the Pawns!',instruction:'Tap the glowing squares to place your brave soldiers!'},{type:'story',emoji:'🌟',heading:'World 1 Complete!',text:'You have explored the Chess Kingdom! You know the board, you know the heroes, and you placed the pawn army!'}]}
 ];
@@ -487,7 +478,10 @@ function startJourney(){
   soundFanfare();
   updateHomeUI();renderWorlds();showScreen('screen-home');
 }
-function showHome(){updateHomeUI();renderWorlds();showScreen('screen-home');}
+function showHome(){
+  if (currentAudio) currentAudio.pause();
+  updateHomeUI();renderWorlds();showScreen('screen-home');
+}
 
 function updateHomeUI(){
   $('home-hero-name').textContent=state.heroName;$('home-stars').textContent=state.stars;
@@ -580,6 +574,7 @@ function renderStep(){
 }
 
 function nextStep(){
+  if (currentAudio) currentAudio.pause();
   soundClick();state.currentStep++;
   if(state.currentStep>=state.currentLesson.steps.length){
     if(state.practiceMode) completePractice(); else completeLesson();
@@ -592,15 +587,15 @@ function renderStory(step,content){
       <span class="lesson-emoji">${step.emoji}</span>
       <div class="lesson-heading">${step.heading}</div>
       <div class="lesson-text">${step.text}</div>
-      ${step.speech?`<div class="lesson-speech">${step.speech}</div>`:''}
-      <button id="btn-read-text" style="margin-top:15px; padding:10px 20px; border-radius:50px; border:none; background:var(--gold); font-family:'Fredoka One',cursive; font-size:1.1rem; color:#1a1a2e; cursor:pointer; box-shadow:0 4px 15px rgba(255,215,0,0.4);">🔊 Read to me!</button>
+      ${step.speech?`<div class="lesson-speech">${step.speech.replace(/\[.*?\]/g, '')}</div>`:''}
     </div>
     <button class="btn-next" onclick="soundClick();nextStep()">✨ Next!</button>
   `;
+  
+  // Auto-play the audio slightly after the screen loads for perfect UX
   setTimeout(() => {
-    const btn = document.getElementById('btn-read-text');
-    if(btn) btn.onclick = () => { soundClick(); speakText(step.text + (step.speech ? ' ' + step.speech : '')); };
-  }, 50);
+    speakText(step.text + (step.speech ? ' ' + step.speech : ''));
+  }, 400);
 }
 
 function buildBoard(targets){
@@ -635,6 +630,7 @@ function revealPiece(idx){
   const p=PIECES[idx];const card=$(`pc-${idx}`);
   if(!card.classList.contains('correct')){
     card.classList.add('correct');soundReveal();state.piecesDiscovered.push(idx);addCoins(3);$('lesson-coins').textContent=state.coins;$('piece-count').textContent=state.piecesDiscovered.length;$('piece-speech').style.display='block';$('piece-speech-emoji').textContent=p.emoji;$('piece-speech-name').textContent=p.name+' — '+p.role;$('piece-speech-text').textContent=p.desc;
+    speakText(p.desc);
     if(state.piecesDiscovered.length>=6){$('parade-next').style.display='block';soundFanfare();showMiniCelebration('🎉 You met all heroes!');}
   }
 }
@@ -647,6 +643,7 @@ function renderPieceMatch(step,content){
   let grid='<div class="piece-grid" style="grid-template-columns:repeat(2,1fr)">';
   options.forEach(p=>{grid+=`<div class="piece-card" onclick="checkMatch('${p.name}','${piece.name}',this)"><span class="piece-card-emoji">${p.emoji}</span><div class="piece-card-name">${p.name}</div><div class="piece-card-role">${p.role}</div></div>`;});grid+='</div>';
   content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="lesson-speech" style="font-size:1rem;margin-top:.5rem">${clue}</div></div>${grid}<div id="match-next" style="display:none"><button class="btn-next" onclick="nextStep()">🌟 Next!</button></div>`;
+  setTimeout(() => speakText(clue), 400);
 }
 
 function checkMatch(chosen,correct,el){
@@ -657,6 +654,7 @@ function checkMatch(chosen,correct,el){
 function renderQuiz(step,content){
   let opts='';step.options.forEach((o,i)=>{opts+=`<div class="piece-card" style="grid-column:span 1;padding:.8rem;" onclick="checkQuiz(${i},${step.correct},this,'${(step.praise||'').replace(/'/g,'\\\'')}')"><div class="piece-card-name" style="font-size:1rem">${o}</div></div>`;});
   content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="lesson-speech" style="font-size:1rem;margin-top:.5rem">${step.question}</div></div><div class="piece-grid" style="grid-template-columns:repeat(2,1fr)">${opts}</div><div id="quiz-next" style="display:none"><button class="btn-next" onclick="nextStep()">✅ Next!</button></div>`;
+  setTimeout(() => speakText(step.question), 400);
 }
 
 function checkQuiz(idx,correct,el,praise){
