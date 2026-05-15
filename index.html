@@ -30,6 +30,10 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 @keyframes glow{0%,100%{box-shadow:0 0 10px rgba(255,215,0,.3)}50%{box-shadow:0 0 25px rgba(255,215,0,.7)}}
 
+/* MUTE BUTTON */
+.mute-btn { position:fixed; top:15px; right:15px; background:rgba(0,0,0,0.3); border:2px solid var(--gold); border-radius:50%; width:45px; height:45px; font-size:1.4rem; cursor:pointer; z-index:1000; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2); transition:transform 0.1s; }
+.mute-btn:active { transform:scale(0.9); }
+
 /* NAME SCREEN */
 #screen-name{background:linear-gradient(180deg,#1a1a2e,#16213e 50%,#0f3460);justify-content:center;padding:2rem;gap:1.8rem;}
 .name-logo{font-family:'Fredoka One',cursive;font-size:3rem;color:var(--gold);text-shadow:0 0 30px rgba(255,215,0,.5);text-align:center;z-index:1;animation:float 3s ease-in-out infinite;}
@@ -148,13 +152,11 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .practice-title{font-family:'Fredoka One',cursive;font-size:1.4rem;color:white;text-shadow:1px 1px 0 rgba(0,0,0,.2);}
 .practice-sub{color:rgba(255,255,255,.85);font-size:.85rem;font-weight:600;margin-top:.2rem;}
 .practice-emoji{font-size:2.2rem;position:absolute;right:1.2rem;top:50%;transform:translateY(-50%);}
-.mute-btn { position:fixed; top:15px; right:15px; background:rgba(0,0,0,0.3); border:2px solid var(--gold); border-radius:50%; width:45px; height:45px; font-size:1.4rem; cursor:pointer; z-index:1000; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2); transition:transform 0.1s; }
-.mute-btn:active { transform:scale(0.9); }
 </style>
 </head>
 <body>
-<audio id="bg-music" loop src="bgmusic.mp3"></audio> 
-<button id="mute-btn" class="mute-btn" onclick="toggleMute()">🔊</button>  
+<audio id="bg-music" loop src="bgmusic.mp3" preload="auto" playsinline></audio> 
+<button id="mute-btn" class="mute-btn" onclick="toggleMute()">🔊</button>
 <div class="stars-bg" id="stars-bg"></div>
 
 <div id="screen-name" class="screen active">
@@ -251,6 +253,7 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 </div>
 
 <script>
+// ============ AUDIO ENGINE & MUTE LOGIC ============
 let isMuted = false;
 function toggleMute() {
   isMuted = !isMuted;
@@ -259,7 +262,7 @@ function toggleMute() {
   if (bgMusic) bgMusic.muted = isMuted;
   if (isMuted && window.speechSynthesis) window.speechSynthesis.cancel();
 }
-// ============ AUDIO ENGINE ============
+
 let audioCtx = null;
 function getAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
 function playTone(freq,dur,type='sine',vol=0.3,delay=0){
@@ -282,21 +285,56 @@ function soundClick(){playTone(440,.06,'sine',.15);}
 function soundReveal(){playTone(660,.12,'sine',.2,0);playTone(880,.2,'sine',.2,.1);}
 function soundPlace(){playTone(400,.08,'triangle',.2,0);playTone(600,.12,'sine',.2,.07);}
 
-// ============ VOICE HUNTER (Zero-Cost Premium Audio) ============
-if('speechSynthesis' in window) window.speechSynthesis.getVoices(); 
-function speakText(text) {
-  if(isMuted) return;
-  if ('speechSynthesis' in window) {
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel(); 
-    const utterance = new SpeechSynthesisUtterance(text);
-    const voices = window.speechSynthesis.getVoices();
-    // Hunt for a premium deep voice on iOS/Mac
-    const preferred = voices.find(v => v.name.includes('Alex') || v.name.includes('Arthur') || v.name.includes('Daniel') || v.name.includes('Premium'));
-    if (preferred) utterance.voice = preferred;
-    utterance.rate = 0.9; 
-    utterance.pitch = 0.8; // Lowered pitch to simulate baritone storyteller
-    window.speechSynthesis.speak(utterance);
+// ============ TEXT TO SPEECH (Google Cloud + Fallback) ============
+async function speakText(text) {
+  if (isMuted) return;
+  
+  const bgMusic = document.getElementById('bg-music');
+  if (bgMusic && !isMuted) bgMusic.volume = 0.05; // Duck music volume during speech
+
+  const apiKey = 'PASTE_YOUR_API_KEY_HERE'; 
+  
+  // If API key isn't pasted yet, smoothly fallback to local iPad/Mac Voice
+  if (apiKey === 'PASTE_YOUR_API_KEY_HERE' || apiKey === '') {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel(); 
+      const utterance = new SpeechSynthesisUtterance(text);
+      const voices = window.speechSynthesis.getVoices();
+      const preferred = voices.find(v => v.name.includes('Alex') || v.name.includes('Arthur') || v.name.includes('Daniel') || v.name.includes('Premium'));
+      if (preferred) utterance.voice = preferred;
+      utterance.rate = 0.9; 
+      utterance.pitch = 0.8; 
+      utterance.onend = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; };
+      window.speechSynthesis.speak(utterance);
+    }
+    return;
+  }
+
+  // Google Cloud Voice Logic
+  const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
+  const payload = {
+    input: { text: text },
+    voice: { languageCode: 'en-US', name: 'en-US-Journey-D' }, 
+    audioConfig: { audioEncoding: 'MP3' }
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json();
+    if (data.audioContent) {
+      const audio = new Audio('data:audio/mp3;base64,' + data.audioContent);
+      audio.onended = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; }; 
+      audio.play();
+    } else {
+      if (bgMusic && !isMuted) bgMusic.volume = 0.15;
+    }
+  } catch (error) {
+    console.error("Voice error:", error);
+    if (bgMusic && !isMuted) bgMusic.volume = 0.15;
   }
 }
 
@@ -416,9 +454,8 @@ function startJourney(){
   const name=$('hero-name-input').value.trim()||'Hero';
   state.heroName=name;
   
-  // Set background music volume to 15% and play
   const bgMusic = document.getElementById('bg-music');
-  if (bgMusic) {
+  if (bgMusic && !isMuted) {
     bgMusic.volume = 0.15; 
     bgMusic.play();
   }
