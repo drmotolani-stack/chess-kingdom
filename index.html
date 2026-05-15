@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Chess Kingdom</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1E1B2E">
+<link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Chess_zdt45.svg/1024px-Chess_zdt45.svg.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--gold:#FFD700;--gold2:#FFA500;--cream:#FFF8E7;--dark:#1E1B2E;}
+body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;overflow-x:hidden;user-select:none;}
+.screen{display:none;min-height:100vh;flex-direction:column;align-items:center;}
+.screen.active{display:flex;}
+
+/* STARS */
+.stars-bg{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:0;}
+.star{position:absolute;background:white;border-radius:50%;animation:twinkle 2s infinite alternate;}
+@keyframes twinkle{from{opacity:.2}to{opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes pop{0%{transform:scale(0);opacity:0}60%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(130px) rotate(720deg);opacity:0}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes glow{0%,100%{box-shadow:0 0 10px rgba(255,215,0,.3)}50%{box-shadow:0 0 25px rgba(255,215,0,.7)}}
+
+/* NAME SCREEN */
+#screen-name{background:linear-gradient(180deg,#1a1a2e,#16213e 50%,#0f3460);justify-content:center;padding:2rem;gap:1.8rem;}
+.name-logo{font-family:'Fredoka One',cursive;font-size:3rem;color:var(--gold);text-shadow:0 0 30px rgba(255,215,0,.5);text-align:center;z-index:1;animation:float 3s ease-in-out infinite;}
+.chess-icon-big{font-size:5rem;text-align:center;z-index:1;animation:bounce 2s ease-in-out infinite;}
+.subtitle{color:rgba(255,255,255,.8);font-size:1.1rem;text-align:center;z-index:1;font-weight:600;}
+.name-input-wrap{z-index:1;width:100%;max-width:320px;animation:slideUp .6s ease;}
+.name-input-wrap label{display:block;color:var(--gold);font-size:1rem;font-weight:700;margin-bottom:.5rem;text-align:center;}
+.name-input{width:100%;padding:1rem 1.5rem;border-radius:50px;border:3px solid var(--gold);background:rgba(255,255,255,.1);color:white;font-size:1.4rem;font-family:'Fredoka One',cursive;text-align:center;outline:none;}
+.name-input::placeholder{color:rgba(255,255,255,.4);font-family:'Nunito',sans-serif;font-size:1rem;}
+.btn-start{width:100%;max-width:320px;padding:1.1rem;border-radius:50px;border:none;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1a2e;font-size:1.4rem;font-family:'Fredoka One',cursive;cursor:pointer;z-index:1;box-shadow:0 8px 25px rgba(255,215,0,.4);animation:pulse 2s ease-in-out infinite;transition:transform .1s;}
+.btn-start:hover{transform:scale(1.04);}
+.btn-start:active{transform:scale(.96);}
+
+/* HOME */
+#screen-home{background:linear-gradient(180deg,#87CEEB,#98FB98 60%,#228B22);padding:0;overflow-y:auto;}
+.home-header{width:100%;background:linear-gradient(135deg,#1E1B2E,#2D1B69);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;box-shadow:0 4px 20px rgba(0,0,0,.3);}
+.hero-info{display:flex;align-items:center;gap:.75rem;}
+.avatar-circle{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));display:flex;align-items:center;justify-content:center;font-size:1.6rem;border:3px solid rgba(255,255,255,.3);flex-shrink:0;}
+.hero-name{font-family:'Fredoka One',cursive;color:var(--gold);font-size:1.2rem;}
+.hero-title{color:rgba(255,255,255,.6);font-size:.75rem;font-weight:600;}
+.stats-row{display:flex;gap:.75rem;align-items:center;}
+.stat-badge{background:rgba(255,255,255,.15);border-radius:20px;padding:.3rem .7rem;display:flex;align-items:center;gap:.3rem;color:white;font-weight:700;font-size:.9rem;}
+.streak-badge{background:linear-gradient(135deg,#FF6B35,#FF4500);border-radius:20px;padding:.3rem .7rem;display:flex;align-items:center;gap:.3rem;color:white;font-weight:700;font-size:.9rem;}
+.map-title{font-family:'Fredoka One',cursive;font-size:1.8rem;color:#1a1a2e;text-align:center;padding:1.5rem 1rem .5rem;text-shadow:2px 2px 0 rgba(255,255,255,.5);}
+.worlds-container{width:100%;padding:.5rem 1rem 2rem;display:flex;flex-direction:column;gap:1rem;max-width:500px;margin:0 auto;}
+.world-card{border-radius:20px;padding:1.2rem 1.5rem;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 6px 20px rgba(0,0,0,.15);position:relative;overflow:hidden;z-index:10;touch-action:manipulation;}
+.world-card.unlocked:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.2);}
+.world-card.unlocked:active{transform:scale(.97);}
+.world-card.locked{opacity:.6;cursor:not-allowed;filter:grayscale(.4);}
+.world-card::before{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;background:rgba(255,255,255,.15);border-radius:50%;}
+.world-num{font-size:.75rem;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:1px;text-transform:uppercase;}
+.world-name{font-family:'Fredoka One',cursive;font-size:1.4rem;color:white;margin:.2rem 0;text-shadow:1px 1px 0 rgba(0,0,0,.2);}
+.world-desc{color:rgba(255,255,255,.85);font-size:.85rem;font-weight:600;}
+.world-emoji{font-size:2.2rem;position:absolute;right:1.2rem;top:50%;transform:translateY(-50%);}
+.world-progress{margin-top:.7rem;background:rgba(255,255,255,.25);border-radius:10px;height:8px;overflow:hidden;}
+.world-progress-fill{height:100%;background:rgba(255,255,255,.9);border-radius:10px;transition:width .5s ease;}
+.stars-row{display:flex;gap:4px;margin-top:.4rem;}
+.lock-icon{position:absolute;right:1.2rem;top:50%;transform:translateY(-50%);font-size:1.8rem;}
+
+/* LESSON */
+#screen-lesson{background:linear-gradient(180deg,#1a1a2e,#16213e);padding:0;overflow-y:auto;}
+.lesson-header{width:100%;padding:1rem 1.5rem;display:flex;align-items:center;gap:1rem;background:rgba(255,255,255,.05);}
+.btn-back{background:rgba(255,255,255,.15);border:none;border-radius:50%;width:44px;height:44px;color:white;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0;}
+.lesson-title-header{font-family:'Fredoka One',cursive;color:white;font-size:1.2rem;flex:1;}
+.progress-bar-wrap{width:100%;padding:.5rem 1.5rem;}
+.progress-bar{height:8px;background:rgba(255,255,255,.15);border-radius:10px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:10px;transition:width .5s ease;}
+.lesson-content{width:100%;padding:1rem 1.5rem;display:flex;flex-direction:column;align-items:center;gap:1.2rem;max-width:500px;margin:0 auto;}
+.lesson-card{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:24px;padding:1.5rem;text-align:center;animation:slideUp .4s ease;}
+.lesson-emoji{font-size:4rem;animation:bounce 2s ease-in-out infinite;display:block;}
+.lesson-heading{font-family:'Fredoka One',cursive;color:var(--gold);font-size:1.8rem;margin:.5rem 0;}
+.lesson-text{color:rgba(255,255,255,.85);font-size:1.05rem;line-height:1.6;font-weight:600;}
+.lesson-speech{background:rgba(255,215,0,.1);border:2px solid rgba(255,215,0,.3);border-radius:16px;padding:1rem;color:var(--gold);font-size:1.1rem;font-weight:700;font-style:italic;margin-top:.5rem;position:relative;}
+.lesson-speech::before{content:'"';font-size:3rem;position:absolute;top:-10px;left:10px;color:var(--gold);opacity:.3;}
+.btn-next{width:100%;max-width:300px;padding:1rem;border-radius:50px;border:none;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1a2e;font-size:1.3rem;font-family:'Fredoka One',cursive;cursor:pointer;box-shadow:0 6px 20px rgba(255,215,0,.35);transition:transform .1s;}
+
+/* BOARD - MAGICAL FOREST AESTHETIC */
+.board-wrap{width:100%;display:flex;flex-direction:column;align-items:center;gap:1rem;}
+.chess-board{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);width:min(336px,88vw);height:min(336px,88vw);border-radius:16px;overflow:hidden;border:4px solid var(--gold);box-shadow:0 0 30px rgba(255,215,0,.3);flex-shrink:0;gap:4px;padding:4px;background:rgba(255,255,255,0.15);}
+.cell{display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .1s,filter .2s;position:relative;min-width:0;min-height:0;overflow:hidden;}
+.cell.light{background:#E2F0CB;border-radius:6px;box-shadow:inset 0 -3px 0 rgba(0,0,0,0.1);}
+.cell.dark{background:#88D49E;border-radius:6px;box-shadow:inset 0 -3px 0 rgba(0,0,0,0.1);}
+.cell.highlight{background:rgba(255,215,0,.6)!important;animation:pulse .5s ease;}
+.cell.target{background:rgba(255,215,0,.4)!important; border:3px solid var(--gold)!important; box-shadow:0 0 20px rgba(255,215,0,.8)!important; z-index:2; animation:glow 1.2s ease-in-out infinite!important;}.cell.wrong{animation:shake .4s ease;}
+.cell:hover{filter:brightness(1.15);}
+.cell-piece{font-size:clamp(1rem,3.5vw,1.6rem);transition:transform .2s;pointer-events:none;line-height:1;display:flex;align-items:center;justify-content:center;}
+
+/* PIECE CARDS */
+.piece-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;width:100%;}
+.piece-card{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);border-radius:18px;padding:1rem .5rem;text-align:center;cursor:pointer;transition:transform .2s,border-color .2s,background .2s;}
+.piece-card.selected{border-color:var(--gold);background:rgba(255,215,0,.15);}
+.piece-card.correct{border-color:#4CAF50;background:rgba(76,175,80,.2);animation:pop .4s ease;}
+.piece-card.wrong-card{border-color:#EF4444;background:rgba(239,68,68,.15);animation:shake .4s ease;}
+.piece-card-emoji{font-size:2.8rem;display:block;line-height:1.2;}
+.piece-card-name{font-family:'Fredoka One',cursive;color:white;font-size:.9rem;margin-top:.3rem;}
+.piece-card-role{color:rgba(255,255,255,.5);font-size:.7rem;font-weight:600;}
+.game-instruction{background:rgba(255,255,255,.1);border-radius:16px;padding:.8rem 1.2rem;color:white;font-size:1rem;font-weight:700;text-align:center;border:1px solid rgba(255,255,255,.2);}
+.game-instruction .hl{color:var(--gold);}
+
+/* REWARD */
+#screen-reward{background:linear-gradient(135deg,#1a1a2e,#2d1b69);justify-content:center;padding:2rem;gap:1.5rem;}
+.reward-emoji{font-size:5rem;animation:bounce 1s ease-in-out infinite;}
+.reward-title{font-family:'Fredoka One',cursive;color:var(--gold);font-size:2.5rem;text-align:center;text-shadow:0 0 20px rgba(255,215,0,.5);animation:pop .5s ease;}
+.reward-subtitle{color:rgba(255,255,255,.8);font-size:1.1rem;text-align:center;font-weight:600;}
+.reward-stars{display:flex;gap:.5rem;animation:slideUp .5s ease .2s both;}
+.reward-star{font-size:3rem;}
+.xp-gained{background:rgba(255,215,0,.15);border:2px solid var(--gold);border-radius:20px;padding:.7rem 2rem;color:var(--gold);font-family:'Fredoka One',cursive;font-size:1.3rem;animation:pop .5s ease .4s both;}
+.badge-earned{background:linear-gradient(135deg,#8B5CF6,#6D28D9);border-radius:20px;padding:1rem 1.5rem;display:flex;align-items:center;gap:.8rem;box-shadow:0 6px 20px rgba(139,92,246,.4);animation:pop .5s ease .6s both;}
+.badge-icon{font-size:2rem;}
+.badge-name{font-family:'Fredoka One',cursive;color:white;font-size:1.1rem;}
+.badge-desc{color:rgba(255,255,255,.7);font-size:.8rem;font-weight:600;}
+.confetti-piece{position:fixed;width:10px;height:10px;border-radius:2px;animation:confettiFall 1.5s ease-out forwards;pointer-events:none;z-index:999;}
+
+/* DASHBOARD & PRACTICE */
+#screen-dashboard{background:#F8F9FA;padding:0;overflow-y:auto;}
+.dash-header{background:linear-gradient(135deg,#1E1B2E,#2D1B69);padding:1.5rem;color:white;text-align:center;}
+.dash-title{font-family:'Fredoka One',cursive;font-size:1.8rem;color:var(--gold);}
+.dash-subtitle{color:rgba(255,255,255,.7);font-size:.9rem;margin-top:.3rem;}
+.dash-content{padding:1.5rem;display:flex;flex-direction:column;gap:1.2rem;max-width:500px;margin:0 auto;}
+.dash-section-title{font-family:'Fredoka One',cursive;color:#1a1a2e;font-size:1.2rem;margin-bottom:.5rem;}
+.stat-cards-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;}
+.stat-card{background:white;border-radius:16px;padding:1rem;text-align:center;box-shadow:0 3px 15px rgba(0,0,0,.08);}
+.stat-card-value{font-family:'Fredoka One',cursive;font-size:2rem;color:#1a1a2e;}
+.stat-card-label{color:#888;font-size:.8rem;font-weight:700;}
+.progress-section{background:white;border-radius:16px;padding:1.2rem;box-shadow:0 3px 15px rgba(0,0,0,.08);}
+.world-progress-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.8rem;}
+.world-mini-bar{height:6px;background:#eee;border-radius:6px;margin-top:3px;overflow:hidden;}
+.world-mini-fill{height:100%;border-radius:6px;}
+.btn-dash-close{width:100%;padding:1rem;border-radius:50px;border:none;background:linear-gradient(135deg,#1E1B2E,#2D1B69);color:var(--gold);font-family:'Fredoka One',cursive;font-size:1.2rem;cursor:pointer;}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:500px;background:rgba(26,26,46,.95);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.1);display:flex;z-index:100;}
+.nav-btn{flex:1;padding:.8rem 0;background:none;border:none;color:rgba(255,255,255,.5);font-size:.7rem;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color .2s;font-family:'Nunito',sans-serif;}
+.nav-btn.active{color:var(--gold);}
+.nav-btn-icon{font-size:1.4rem;}
+.spacer{height:70px;}
+.practice-banner{width:100%;background:linear-gradient(135deg,#F59E0B,#D97706);border-radius:20px;padding:1.2rem 1.5rem;cursor:pointer;transition:transform .2s;box-shadow:0 6px 20px rgba(245,158,11,.4);animation:glow 2s ease-in-out infinite;position:relative;overflow:hidden;}
+.practice-title{font-family:'Fredoka One',cursive;font-size:1.4rem;color:white;text-shadow:1px 1px 0 rgba(0,0,0,.2);}
+.practice-sub{color:rgba(255,255,255,.85);font-size:.85rem;font-weight:600;margin-top:.2rem;}
+.practice-emoji{font-size:2.2rem;position:absolute;right:1.2rem;top:50%;transform:translateY(-50%);}
+</style>
+</head>
+<body>
+<div class="stars-bg" id="stars-bg"></div>
+
+<div id="screen-name" class="screen active">
+  <div class="chess-icon-big">♟️</div>
+  <div class="name-logo">Chess Kingdom</div>
+  <div class="subtitle">A magical adventure awaits your little hero!</div>
+  <div class="name-input-wrap">
+    <label>What is your hero's name?</label>
+    <input class="name-input" id="hero-name-input" type="text" placeholder="Type name here..." maxlength="12"/>
+  </div>
+  <button class="btn-start" onclick="startJourney()">⚔️ Begin Adventure!</button>
+</div>
+
+<div id="screen-home" class="screen">
+  <div class="home-header">
+    <div class="hero-info">
+      <div class="avatar-circle" id="home-avatar">♟️</div>
+      <div>
+        <div class="hero-name" id="home-hero-name">Hero</div>
+        <div class="hero-title" id="home-hero-title">Pawn Explorer</div>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-badge">⭐ <span id="home-stars">0</span></div>
+      <div class="stat-badge">🪙 <span id="home-coins">0</span></div>
+      <div class="streak-badge">🔥 <span id="home-streak">1</span></div>
+    </div>
+  </div>
+  <div class="map-title">🗺️ Chess Kingdom Map</div>
+  <div class="worlds-container" id="worlds-container"></div>
+  <div class="spacer"></div>
+  <div class="bottom-nav">
+    <button class="nav-btn active" onclick="showHome()"><span class="nav-btn-icon">🏰</span>Map</button>
+    <button class="nav-btn" onclick="showDashboard()"><span class="nav-btn-icon">📊</span>Progress</button>
+    <button class="nav-btn" onclick="showTrophies()"><span class="nav-btn-icon">🏆</span>Trophies</button>
+  </div>
+</div>
+
+<div id="screen-lesson" class="screen">
+  <div class="lesson-header">
+    <button class="btn-back" onclick="showHome()">←</button>
+    <div class="lesson-title-header" id="lesson-title-header">Lesson</div>
+    <div class="stat-badge">🪙 <span id="lesson-coins">0</span></div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar"><div class="progress-bar-fill" id="lesson-progress-bar" style="width:0%"></div></div>
+  </div>
+  <div class="lesson-content" id="lesson-content"></div>
+  <div class="spacer"></div>
+</div>
+
+<div id="screen-reward" class="screen">
+  <div class="reward-emoji" id="reward-emoji">🏆</div>
+  <div class="reward-title" id="reward-title">Amazing!</div>
+  <div class="reward-subtitle" id="reward-subtitle">You did it!</div>
+  <div class="reward-stars"><span class="reward-star">⭐</span><span class="reward-star">⭐</span><span class="reward-star">⭐</span></div>
+  <div class="xp-gained" id="xp-gained">+50 XP</div>
+  <div class="badge-earned" id="badge-earned" style="display:none">
+    <span class="badge-icon">🎖️</span>
+    <div><div class="badge-name" id="badge-name">Badge!</div><div class="badge-desc" id="badge-desc">First steps!</div></div>
+  </div>
+  <button class="btn-start" onclick="afterReward()">🎮 Keep Going!</button>
+</div>
+
+<div id="screen-dashboard" class="screen">
+  <div class="dash-header">
+    <div class="dash-title">📊 Parent Dashboard</div>
+    <div class="dash-subtitle" id="dash-child-name">Tracking your hero's progress</div>
+  </div>
+  <div class="dash-content">
+    <div>
+      <div class="dash-section-title">📈 Quick Stats</div>
+      <div class="stat-cards-grid">
+        <div class="stat-card"><div class="stat-card-value" id="dash-lessons">0</div><div class="stat-card-label">Lessons Done</div></div>
+        <div class="stat-card"><div class="stat-card-value" id="dash-stars">0</div><div class="stat-card-label">Stars Earned</div></div>
+        <div class="stat-card"><div class="stat-card-value" id="dash-coins">0</div><div class="stat-card-label">Coins Collected</div></div>
+        <div class="stat-card"><div class="stat-card-value" id="dash-streak">0</div><div class="stat-card-label">Day Streak 🔥</div></div>
+      </div>
+    </div>
+    <div class="progress-section">
+      <div class="dash-section-title">🗺️ World Progress</div>
+      <div id="dash-world-progress"></div>
+    </div>
+    <div class="progress-section">
+      <div class="dash-section-title">🏅 Badges Earned</div>
+      <div id="dash-badges" style="display:flex;flex-wrap:wrap;gap:.5rem;"></div>
+    </div>
+    <div class="progress-section" id="dash-practice-section">
+      <div class="dash-section-title">🔁 Practice Stats</div>
+      <div id="dash-practice-stats"></div>
+    </div>
+    <button class="btn-dash-close" onclick="showHome()">⬅️ Back to Map</button>
+  </div>
+</div>
+
+<script>
+// ============ AUDIO ENGINE ============
+let audioCtx = null;
+function getAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
+function playTone(freq,dur,type='sine',vol=0.3,delay=0){
+  try{
+    const ctx=getAudio();const o=ctx.createOscillator();const g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.type=type;o.frequency.setValueAtTime(freq,ctx.currentTime+delay);
+    g.gain.setValueAtTime(0,ctx.currentTime+delay);
+    g.gain.linearRampToValueAtTime(vol,ctx.currentTime+delay+0.02);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+delay+dur);
+    o.start(ctx.currentTime+delay);o.stop(ctx.currentTime+delay+dur+0.05);
+  }catch(e){}
+}
+function soundCorrect(){playTone(523,.15,'sine',.25,0);playTone(659,.15,'sine',.25,.1);playTone(784,.25,'sine',.25,.2);}
+function soundWrong(){playTone(300,.1,'sawtooth',.15,0);playTone(250,.2,'sawtooth',.15,.1);}
+function soundCoin(){playTone(880,.08,'sine',.2,0);playTone(1046,.1,'sine',.2,.08);}
+function soundFanfare(){[523,659,784,1047].forEach((f,i)=>playTone(f,.2,'sine',.3,i*.12));playTone(1047,.5,'sine',.35,.5);}
+function soundClick(){playTone(440,.06,'sine',.15);}
+function soundReveal(){playTone(660,.12,'sine',.2,0);playTone(880,.2,'sine',.2,.1);}
+function soundPlace(){playTone(400,.08,'triangle',.2,0);playTone(600,.12,'sine',.2,.07);}
+
+// ============ VOICE HUNTER (Zero-Cost Premium Audio) ============
+if('speechSynthesis' in window) window.speechSynthesis.getVoices(); 
+function speakText(text) {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel(); 
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+    // Hunt for a premium deep voice on iOS/Mac
+    const preferred = voices.find(v => v.name.includes('Alex') || v.name.includes('Arthur') || v.name.includes('Daniel') || v.name.includes('Premium'));
+    if (preferred) utterance.voice = preferred;
+    utterance.rate = 0.9; 
+    utterance.pitch = 0.8; // Lowered pitch to simulate baritone storyteller
+    window.speechSynthesis.speak(utterance);
+  }
+}
+
+// ============ DATA ============
+const WORLDS=[
+  {id:1,name:"Chess Kingdom",emoji:"🏰",color:"linear-gradient(135deg,#8B5CF6,#6D28D9)",desc:"Discover the magical board!",lessons:3,unlocked:true},
+  {id:2,name:"Castle Towers",emoji:"🏯",color:"linear-gradient(135deg,#3B82F6,#1D4ED8)",desc:"Learn how the Rook moves!",lessons:3,unlocked:false},
+  {id:3,name:"Wizard Paths",emoji:"🧙",color:"linear-gradient(135deg,#10B981,#047857)",desc:"Follow the Bishop's magic!",lessons:3,unlocked:false},
+  {id:4,name:"Queen's Power",emoji:"👸",color:"linear-gradient(135deg,#EC4899,#9D174D)",desc:"Unleash the Queen's power!",lessons:3,unlocked:false},
+  {id:5,name:"Horse Jump Valley",emoji:"🐴",color:"linear-gradient(135deg,#F59E0B,#B45309)",desc:"Learn the Knight's special jump!",lessons:3,unlocked:false},
+  {id:6,name:"Brave Pawn Army",emoji:"⚔️",color:"linear-gradient(135deg,#EF4444,#B91C1C)",desc:"March with the brave soldiers!",lessons:3,unlocked:false},
+  {id:7,name:"Protect the King",emoji:"👑",color:"linear-gradient(135deg,#6366F1,#4338CA)",desc:"Keep your King safe!",lessons:3,unlocked:false},
+  {id:8,name:"Battle Academy",emoji:"🛡️",color:"linear-gradient(135deg,#0EA5E9,#0369A1)",desc:"Learn your first battle moves!",lessons:3,unlocked:false},
+  {id:9,name:"Champion Arena",emoji:"🏆",color:"linear-gradient(135deg,#D97706,#92400E)",desc:"Play real games! Become champion!",lessons:3,unlocked:false},
+];
+
+const PIECES=[
+  {emoji:'♙',name:'Pawn',role:'Brave Soldier',color:'#6B7280',clues:["I march forward one step at a time — never backward!","I am the smallest soldier, but I have a secret power: I can become a Queen!"],desc:"I am small but brave! I march forward to protect everyone!"},
+  {emoji:'♖',name:'Rook',role:'Castle Tower',color:'#3B82F6',clues:["I am shaped like a castle tower and I slide in straight lines only!","I never turn corners. I only go straight — like a train on a track!"],desc:"I am the mighty castle tower! I slide straight — left, right, up, down."},
+  {emoji:'♗',name:'Bishop',role:'Magic Wizard',color:'#10B981',clues:["I am a wizard and I ONLY travel on diagonal paths — never straight!","I stay on one colour my whole life — always diagonal, always magical!"],desc:"I am the mystical wizard! I only travel on magical diagonal paths."},
+  {emoji:'♕',name:'Queen',role:'Superhero Queen',color:'#EC4899',clues:["I am the most powerful piece! I can move in ANY direction — straight or diagonal!","I am the most dangerous piece on the board. I can go anywhere!"],desc:"I am the most powerful! I can go in ANY direction — straight or diagonal."},
+  {emoji:'♔',name:'King',role:'Precious Leader',color:'#F59E0B',clues:["I am the most important piece — if I fall, the game is over!","I can only move ONE square at a time, but the whole army protects me!"],desc:"I am the most precious! I can only move one square at a time."},
+  {emoji:'♘',name:'Knight',role:'Jumping Horse',color:'#8B5CF6',clues:["I move in an L-shape — two squares one way, then one square sideways!","I am the ONLY piece that can jump over other pieces!"],desc:"I jump in an L-shape — two squares then one! I leap over others!"},
+];
+
+const BADGES=[
+  {id:'board_explorer',name:'Board Explorer',desc:'Explored the magical board!',emoji:'🗺️'},
+  {id:'piece_master',name:'Piece Master',desc:'Met all chess heroes!',emoji:'⚔️'},
+  {id:'world1_champ',name:'World 1 Champion',desc:'Conquered Chess Kingdom!',emoji:'🏰'},
+  {id:'practice_hero',name:'Practice Hero',desc:'Completed 5 practice rounds!',emoji:'🔁'},
+  {id:'quiz_wizard',name:'Quiz Wizard',desc:'Got 10 questions right!',emoji:'🧙'},
+  {id:'rook_master',name:'Rook Master',desc:'Conquered the Castle Towers!',emoji:'🏯'},
+  {id:'bishop_wizard',name:'Bishop Wizard',desc:'Mastered the diagonal magic!',emoji:'🧙'},
+  {id:'queen_commander',name:'Queen Commander',desc:'Unleashed the Queen\'s full power!',emoji:'👸'},
+  {id:'knight_champion',name:'Knight Champion',desc:'Mastered the L-jump!',emoji:'🐴'},
+  {id:'pawn_hero',name:'Pawn Hero',desc:'Led the brave pawn army!',emoji:'⚔️'},
+  {id:'king_guardian',name:'King Guardian',desc:'Learned to protect the King!',emoji:'👑'},
+  {id:'battle_graduate',name:'Battle Graduate',desc:'Graduated from Battle Academy!',emoji:'🛡️'},
+  {id:'grand_champion',name:'Grand Champion',desc:'Conquered all 9 worlds!',emoji:'🏆'}
+];
+const TITLES=['Pawn Explorer','Knight Jumper','Castle Defender','Bishop Seeker','Queen Commander','Chess Hero'];
+
+// ============ LESSON DATA ============
+const WORLD1_LESSONS=[
+  {id:'w1l1',title:'The Magical Board',steps:[{type:'story',emoji:'🏰',heading:'Welcome to Chess Kingdom!',text:'A long time ago, in a magical kingdom far away... two armies faced each other on a great battle board!',speech:'Every square on this board is a magical land where our heroes live!'},{type:'board-explore',heading:'Touch the Magic Board!',instruction:'Tap any square on the board to light it up!',goal:5},{type:'quiz',heading:'Quick Question! 🧠',question:'How many squares are on a chess board?',options:['32','64','100','48'],correct:1,praise:'Yes! 64 squares — 8 rows of 8! You are SO smart!'}]},
+  {id:'w1l2',title:'Meet the Chess Heroes!',steps:[{type:'piece-parade',heading:'The Chess Heroes!',instruction:'Tap each hero to meet them!'},{type:'piece-match',heading:'Who Am I? 🎭',instruction:'Read the clue and find the right hero!'}]},
+  {id:'w1l3',title:'Set Up the Kingdom!',steps:[{type:'board-place',heading:'Place the Pawns!',instruction:'Tap the glowing squares to place your brave soldiers!'},{type:'story',emoji:'🌟',heading:'World 1 Complete!',text:'You have explored the Chess Kingdom! You know the board, you know the heroes, and you placed the pawn army!'}]}
+];
+const WORLD2_LESSONS=[
+  {id:'w2l1',title:'Meet the Rook!',steps:[{type:'story',emoji:'🏯',heading:'The Mighty Castle Tower!',text:'Deep in the Chess Kingdom lives a MIGHTY castle tower called the ROOK! It slides in straight lines!',speech:'I am the Rook! I slide in straight lines — left, right, up, and down!'},{type:'rook-move',heading:'Drive the Rook! 🏯',instruction:'Tap a glowing square to move the Rook along its straight path!',goal:5}]},
+  {id:'w2l2',title:'Rook Race!',steps:[{type:'rook-capture',heading:'Capture the Treasure! 🎯',instruction:'Move the Rook to capture all the golden treasure pieces!'}]},
+  {id:'w2l3',title:'Rook Champion!',steps:[{type:'rook-move',heading:'Rook Master Challenge! 🏆',instruction:'Show your rook skills — collect 8 squares this time!',goal:8}]}
+];
+const WORLD3_LESSONS=[
+  {id:'w3l1',title:'Meet the Bishop!',steps:[{type:'story',emoji:'🧙',heading:'The Magical Wizard!',text:'In the deep forests lives a WIZARD called the BISHOP! This wizard only travels on magical diagonal paths!',speech:'I am the Bishop! I slide diagonally across the board!'},{type:'bishop-move',heading:'Guide the Wizard! 🧙',instruction:'Tap a glowing square to send the wizard on a diagonal path!',goal:5}]},
+  {id:'w3l2',title:'Colour Magic!',steps:[{type:'quiz',heading:'Colour Quiz! 🎨',question:'If the Bishop starts on a dark square, which squares can it reach?',options:['Only light squares','Both colours','Only dark squares','No squares'],correct:2,praise:'Dark squares only! It stays on its colour forever!'}]},
+  {id:'w3l3',title:'Wizard Champion!',steps:[{type:'bishop-move',heading:'Bishop Master! 🔮',instruction:'Master the diagonals — collect 8 squares!',goal:8}]}
+];
+const WORLD4_LESSONS=[
+  {id:'w4l1',title:'Meet the Queen!',steps:[{type:'story',emoji:'👸',heading:'The Most Powerful Piece!',text:'The QUEEN can move in ANY direction she wants! Like a Rook AND a Bishop combined!',speech:'I am the Queen! No one can stop me!'},{type:'queen-move',heading:'Command the Queen! 👸',instruction:'The Queen can go anywhere — tap a glowing square!',goal:6}]},
+  {id:'w4l2',title:'Queen\'s Hunt!',steps:[{type:'queen-move',heading:'Queen\'s Treasure Hunt! 🎯',instruction:'Guide the Queen on her powerful patrol!',goal:8}]},
+  {id:'w4l3',title:'Queen Champion!',steps:[{type:'queen-move',heading:'Queen Master! 👸',instruction:'Show your Queen mastery — explore 10 squares!',goal:10}]}
+];
+const WORLD5_LESSONS=[
+  {id:'w5l1',title:'Meet the Knight!',steps:[{type:'story',emoji:'🐴',heading:'The Jumping Horse!',text:'The KNIGHT jumps in an L-shape! It is the ONLY piece that can jump OVER other pieces!',speech:'I jump in an L — two squares one way, then one sideways!'},{type:'knight-move',heading:'Jump with the Knight! 🐴',instruction:'Tap a glowing square — only the Knight\'s magic L-squares light up!',goal:4}]},
+  {id:'w5l2',title:'Knight Jump Quest!',steps:[{type:'knight-move',heading:'Knight Jump Quest! ⭐',instruction:'Practice the L-jump — reach 6 different squares!',goal:6}]},
+  {id:'w5l3',title:'Knight Champion!',steps:[{type:'knight-move',heading:'Knight Master! 🏇',instruction:'Master the L-jump — reach 8 squares!',goal:8}]}
+];
+const WORLD6_LESSONS=[
+  {id:'w6l1',title:'Meet the Pawns!',steps:[{type:'story',emoji:'⚔️',heading:'The Brave Soldiers!',text:'Pawns march FORWARD — never backward! On their first move, they can go 1 OR 2 squares.',speech:'Forward march!'},{type:'pawn-march',heading:'March the Pawns! ⚔️',instruction:'Tap a glowing square to march the brave soldier forward!',goal:5}]},
+  {id:'w6l2',title:'Pawn Power!',steps:[{type:'pawn-capture',heading:'Capture the Enemy! 🗡️',instruction:'Move the pawn to capture the red enemy pieces diagonally!'}]},
+  {id:'w6l3',title:'Pawn Promotion!',steps:[{type:'pawn-promote',heading:'Escort to the Crown! 👑',instruction:'Guide the brave pawn all the way to the other side to become a Queen!'}]}
+];
+const WORLD7_LESSONS=[
+  {id:'w7l1',title:'The King!',steps:[{type:'story',emoji:'👑',heading:'The Most Important Piece!',text:'The King moves ONE square in ANY direction. If the King is caught, the GAME IS OVER!',speech:'Protect me above all others!'},{type:'king-move',heading:'Move the King! 👑',instruction:'Tap any glowing square to move the King one step!',goal:6}]},
+  {id:'w7l2',title:'What is CHECK?',steps:[{type:'safe-square',heading:'Find the Safe Square! 🛡️',instruction:'The King is in danger! Tap the safe square to escape CHECK!'}]},
+  {id:'w7l3',title:'Checkmate!',steps:[{type:'quiz',heading:'Checkmate Quiz! 🏁',question:'What is CHECKMATE?',options:['King moves two squares','King in check with no escape','Capturing the Queen','Starting the game'],correct:1,praise:'Check with NO escape — game over!'}]}
+];
+const WORLD8_LESSONS=[
+  {id:'w8l1',title:'Control the Centre!',steps:[{type:'centre-control',heading:'Claim the Centre! 🎯',instruction:'Tap the 4 glowing centre squares to claim them for your army!'}]},
+  {id:'w8l2',title:'Opening Moves!',steps:[{type:'opening-sequence',heading:'Play the Opening! ♟️',instruction:'Follow the glowing squares to play the perfect opening!'}]},
+  {id:'w8l3',title:'Capture Treasure!',steps:[{type:'treasure-capture',heading:'Spot the Free Piece! 💎',instruction:'Find and capture the unprotected enemy piece on the board!'}]}
+];
+const WORLD9_LESSONS=[
+  {id:'w9l1',title:'Your First Game!',steps:[{type:'mini-game-quiz',heading:'Champion Quiz! 🏆',questions:[{q:'Which piece moves in an L-shape?',opts:['Rook','Knight','Bishop','Queen'],correct:1,praise:'Knight!'},{q:'Which piece is most important?',opts:['Queen','Bishop','King','Rook'],correct:2,praise:'The King!'}]}]},
+  {id:'w9l2',title:'Chess Champion!',steps:[{type:'champion-board',heading:'The Champion\'s Challenge! 🏆',instruction:'Make 3 strong chess moves to prove you are a Champion!',goal:3}]},
+  {id:'w9l3',title:'Grand Champion!',steps:[{type:'story',emoji:'🌈',heading:'CHESS KINGDOM COMPLETE!',text:'YOU DID IT! You have conquered all 9 worlds of the Chess Kingdom!',speech:'All hail the Chess Champion!'}]}
+];
+
+function getPracticeRound(){
+  const pool=[{type:'piece-match',heading:'Who Am I? 🎭',instruction:'Read the clue and find the right hero!'},{type:'quiz',heading:'Board Quiz! 🏁',question:'How many squares does a chess board have?',options:['64','32','48','128'],correct:0,praise:'64 squares!'},{type:'rook-move',heading:'Rook Practice! 🏯',instruction:'Move the Rook and collect squares!',goal:5},{type:'knight-move',heading:'Knight Practice! 🐴',instruction:'Jump with the Knight in L-shapes!',goal:4}];
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+// ============ STATE ============
+let state={
+  heroName:'',stars:0,coins:0,xp:0,streak:1,
+  completedLessons:[],earnedBadges:[],
+  worldProgress:{1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0},
+  practiceRounds:0,practiceCorrect:0,totalQuizCorrect:0,
+  currentWorld:null,currentLesson:null,currentStep:0,
+  piecesDiscovered:[],lightedSquares:0,placedPawns:0,
+  practiceMode:false, moveGame:null, rookCapture:null, pawnGame:null, pawnCapture:null,
+  pawnPromote:null, kingGame:null, safeGame:null, centreGame:null, openingGame:null, treasureCapture:null, championGame:null, mqQuiz:null
+};
+
+// ============ HELPERS ============
+function $(id){return document.getElementById(id);}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');}
+function initStars(){const bg=$('stars-bg');for(let i=0;i<60;i++){const s=document.createElement('div');s.className='star';const size=Math.random()*3+1;s.style.cssText=`width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${1.5+Math.random()*2}s`;bg.appendChild(s);}}
+function addCoins(n){state.coins+=n;soundCoin();}
+function showMiniCelebration(msg){const el=document.createElement('div');el.style.cssText=`position:fixed;top:20%;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#FFD700,#FFA500);color:#1a1a2e;font-family:'Fredoka One',cursive;font-size:1.2rem;padding:.7rem 1.5rem;border-radius:50px;z-index:500;pointer-events:none;animation:pop .3s ease;box-shadow:0 6px 20px rgba(255,215,0,.4);white-space:nowrap;`;el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),2000);}
+function launchConfetti(){const colors=['#FFD700','#FF6B6B','#4ECDC4','#A855F7','#3B82F6','#10B981'];for(let i=0;i<40;i++){const el=document.createElement('div');el.className='confetti-piece';el.style.cssText=`left:${20+Math.random()*60}%;top:${Math.random()*30}%;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'2px'};animation-delay:${Math.random()*.5}s;animation-duration:${1+Math.random()}s`;document.body.appendChild(el);setTimeout(()=>el.remove(),2000);}}
+
+// ============ NAVIGATION ============
+function startJourney(){const name=$('hero-name-input').value.trim()||'Hero';state.heroName=name;soundFanfare();updateHomeUI();renderWorlds();showScreen('screen-home');}
+function showHome(){updateHomeUI();renderWorlds();showScreen('screen-home');}
+
+function updateHomeUI(){
+  $('home-hero-name').textContent=state.heroName;$('home-stars').textContent=state.stars;
+  $('home-coins').textContent=state.coins;$('home-streak').textContent=state.streak;
+  const ti=Math.min(Math.floor(state.xp/100),TITLES.length-1);
+  $('home-hero-title').textContent=TITLES[ti];
+  $('home-avatar').textContent=ti>=4?'👑':ti>=3?'⚔️':ti>=2?'🛡️':'♟️';
+}
+
+function renderWorlds(){
+  const container=$('worlds-container');container.innerHTML='';
+  const anyProgress=Object.values(state.worldProgress).some(v=>v>0);
+  if(anyProgress){
+    const pb=document.createElement('div');pb.className='practice-banner';
+    pb.innerHTML=`<div class="practice-title">🔁 Practice Mode!</div><div class="practice-sub">Drill your skills — ${state.practiceRounds} rounds done!</div><span class="practice-emoji">⭐</span>`;
+    pb.addEventListener('click', ()=>{soundClick();startPractice();});
+    container.appendChild(pb);
+  }
+  WORLDS.forEach(w=>{
+    const done=state.worldProgress[w.id]||0;
+    const pct=Math.round((done/w.lessons)*100);
+    const unlocked=w.id===1||(state.worldProgress[w.id-1]>=(WORLDS[w.id-2]?.lessons||99));
+    const card=document.createElement('div');
+    card.className='world-card '+(unlocked?'unlocked':'locked');card.style.background=w.color;
+    card.innerHTML=`<div class="world-num">World ${w.id}</div><div class="world-name">${w.name}</div><div class="world-desc">${w.desc}</div>${unlocked?`<div class="world-progress"><div class="world-progress-fill" style="width:${pct}%"></div></div><div class="stars-row">${[0,1,2].map(i=>`<span>${i<done?'⭐':'☆'}</span>`).join('')}</div><span class="world-emoji">${w.emoji}</span>`:`<span class="lock-icon">🔒</span>`}`;
+    if(unlocked) card.addEventListener('click', ()=>{soundClick();startWorld(w.id);});
+    container.appendChild(card);
+  });
+}
+
+function startWorld(worldId){
+  state.currentWorld=worldId;
+  const allLessons={1:WORLD1_LESSONS,2:WORLD2_LESSONS,3:WORLD3_LESSONS,4:WORLD4_LESSONS,5:WORLD5_LESSONS,6:WORLD6_LESSONS,7:WORLD7_LESSONS,8:WORLD8_LESSONS,9:WORLD9_LESSONS};
+  const lessons=allLessons[worldId];
+  if(lessons){
+    const idx=Math.min(state.worldProgress[worldId]||0,lessons.length-1);
+    startLesson(lessons[idx]);
+  } else {
+    showComingSoon(worldId);
+  }
+}
+
+function showComingSoon(worldId){
+  const w=WORLDS[worldId-1];$('lesson-title-header').textContent=w.name;
+  $('lesson-content').innerHTML=`<div class="lesson-card" style="text-align:center;padding:2rem"><span class="lesson-emoji">${w.emoji}</span><div class="lesson-heading" style="color:white;margin:1rem 0">Coming Soon!</div><div class="lesson-text">World ${worldId} is being built by magical builders!</div></div><button class="btn-next" onclick="showHome()">⬅️ Back to Map</button>`;
+  showScreen('screen-lesson');
+}
+
+function startPractice(){
+  state.practiceMode=true;
+  state.currentLesson={id:'practice',title:'Practice Round ⭐',steps:[getPracticeRound()]};
+  state.currentStep=0;state.lightedSquares=0;state.placedPawns=0;state.piecesDiscovered=[];
+  $('lesson-title-header').textContent='🔁 Practice Mode';$('lesson-coins').textContent=state.coins;
+  renderStep();showScreen('screen-lesson');
+}
+
+function startLesson(lesson){
+  state.practiceMode=false;state.currentLesson=lesson;state.currentStep=0;
+  state.lightedSquares=0;state.placedPawns=0;state.piecesDiscovered=[];
+  $('lesson-title-header').textContent=lesson.title;$('lesson-coins').textContent=state.coins;
+  renderStep();showScreen('screen-lesson');
+}
+
+// ============ RENDER ENGINE ============
+function renderStep(){
+  const lesson=state.currentLesson;const step=lesson.steps[state.currentStep];
+  $('lesson-progress-bar').style.width=Math.round((state.currentStep/lesson.steps.length)*100)+'%';
+  const content=$('lesson-content');content.innerHTML='';
+  if(step.type==='story')renderStory(step,content);
+  else if(step.type==='board-explore')renderBoardExplore(step,content);
+  else if(step.type==='board-place')renderBoardPlace(step,content);
+  else if(step.type==='piece-parade')renderPieceParade(step,content);
+  else if(step.type==='piece-match')renderPieceMatch(step,content);
+  else if(step.type==='quiz')renderQuiz(step,content);
+  else if(step.type==='rook-move')renderMovementGame(step,content,'rook');
+  else if(step.type==='bishop-move')renderMovementGame(step,content,'bishop');
+  else if(step.type==='queen-move')renderMovementGame(step,content,'queen');
+  else if(step.type==='knight-move')renderMovementGame(step,content,'knight');
+  else if(step.type==='rook-capture')renderRookCapture(step,content);
+  else if(step.type==='pawn-march')renderPawnMarch(step,content);
+  else if(step.type==='pawn-capture')renderPawnCapture(step,content);
+  else if(step.type==='pawn-promote')renderPawnPromote(step,content);
+  else if(step.type==='king-move')renderKingMove(step,content);
+  else if(step.type==='safe-square')renderSafeSquare(step,content);
+  else if(step.type==='centre-control')renderCentreControl(step,content);
+  else if(step.type==='opening-sequence')renderOpeningSequence(step,content);
+  else if(step.type==='treasure-capture')renderTreasureCapture(step,content);
+  else if(step.type==='champion-board')renderChampionBoard(step,content);
+  else if(step.type==='mini-game-quiz')renderMiniGameQuiz(step,content);
+}
+
+function nextStep(){
+  soundClick();state.currentStep++;
+  if(state.currentStep>=state.currentLesson.steps.length){
+    if(state.practiceMode) completePractice(); else completeLesson();
+  } else renderStep();
+}
+
+function renderStory(step,content){
+  content.innerHTML=`
+    <div class="lesson-card">
+      <span class="lesson-emoji">${step.emoji}</span>
+      <div class="lesson-heading">${step.heading}</div>
+      <div class="lesson-text">${step.text}</div>
+      ${step.speech?`<div class="lesson-speech">${step.speech}</div>`:''}
+      <button id="btn-read-text" style="margin-top:15px; padding:10px 20px; border-radius:50px; border:none; background:var(--gold); font-family:'Fredoka One',cursive; font-size:1.1rem; color:#1a1a2e; cursor:pointer; box-shadow:0 4px 15px rgba(255,215,0,0.4);">🔊 Read to me!</button>
+    </div>
+    <button class="btn-next" onclick="soundClick();nextStep()">✨ Next!</button>
+  `;
+  setTimeout(() => {
+    const btn = document.getElementById('btn-read-text');
+    if(btn) btn.onclick = () => { soundClick(); speakText(step.text + (step.speech ? ' ' + step.speech : '')); };
+  }, 50);
+}
+
+function buildBoard(targets){
+  let html='<div class="chess-board">';
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const light=(r+c)%2===0;const key=`${r}-${c}`;const isT=targets&&targets.includes(key);
+    html+=`<div class="cell ${light?'light':'dark'} ${isT?'target':''}" data-key="${key}"></div>`;
+  }
+  html+='</div>';return html;
+}
+
+// ==== RENDER GAMES ====
+function renderBoardExplore(step,content){
+  state.lightedSquares=0;
+  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="game-instruction">${step.instruction} <span class="hl">(<span id="sq-count">0</span>/${step.goal} lit up!)</span></div></div><div class="board-wrap">${buildBoard(null)}</div><div id="explore-next" style="display:none"><button class="btn-next" onclick="nextStep()">🌟 Amazing! Next!</button></div>`;
+  document.querySelectorAll('.cell').forEach(cell=>{cell.onclick=()=>{if(!cell.classList.contains('highlight')){cell.classList.add('highlight');state.lightedSquares++;soundPlace();$('sq-count').textContent=state.lightedSquares;addCoins(1);$('lesson-coins').textContent=state.coins;if(state.lightedSquares>=step.goal){$('explore-next').style.display='block';soundCorrect();showMiniCelebration('🌟 You found the squares!');}}}});
+}
+
+function renderBoardPlace(step,content){
+  state.placedPawns=0;const targets=[];for(let c=0;c<8;c++)targets.push(`6-${c}`);
+  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="game-instruction">${step.instruction} <span class="hl">(<span id="pawn-count">0</span>/8 placed!)</span></div></div><div class="board-wrap">${buildBoard(targets)}</div><div id="place-next" style="display:none"><button class="btn-next" onclick="nextStep()">👑 Brilliant! Next!</button></div>`;
+  document.querySelectorAll('.cell.target').forEach(cell=>{cell.onclick=()=>{if(!cell.querySelector('.cell-piece')){cell.innerHTML='<span class="cell-piece">♙</span>';cell.classList.remove('target');cell.classList.add('highlight');state.placedPawns++;soundPlace();$('pawn-count').textContent=state.placedPawns;addCoins(2);$('lesson-coins').textContent=state.coins;if(state.placedPawns>=8){$('place-next').style.display='block';soundFanfare();showMiniCelebration('⚔️ The Pawn Army is ready!');}}}});
+}
+
+function renderPieceParade(step,content){
+  state.piecesDiscovered=[];let grid='<div class="piece-grid">';
+  PIECES.forEach((p,i)=>{grid+=`<div class="piece-card" id="pc-${i}" onclick="revealPiece(${i})"><span class="piece-card-emoji">${p.emoji}</span><div class="piece-card-name">${p.name}</div><div class="piece-card-role">${p.role}</div></div>`;});grid+='</div>';
+  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="game-instruction">${step.instruction} <span class="hl">(<span id="piece-count">0</span>/6 met!)</span></div></div>${grid}<div id="piece-speech" class="lesson-card" style="display:none"><span class="lesson-emoji" id="piece-speech-emoji">♙</span><div class="lesson-heading" id="piece-speech-name">Pawn</div><div class="lesson-speech" id="piece-speech-text">Hi!</div></div><div id="parade-next" style="display:none"><button class="btn-next" onclick="nextStep()">🎉 I know them all! Next!</button></div>`;
+}
+
+function revealPiece(idx){
+  const p=PIECES[idx];const card=$(`pc-${idx}`);
+  if(!card.classList.contains('correct')){
+    card.classList.add('correct');soundReveal();state.piecesDiscovered.push(idx);addCoins(3);$('lesson-coins').textContent=state.coins;$('piece-count').textContent=state.piecesDiscovered.length;$('piece-speech').style.display='block';$('piece-speech-emoji').textContent=p.emoji;$('piece-speech-name').textContent=p.name+' — '+p.role;$('piece-speech-text').textContent=p.desc;
+    if(state.piecesDiscovered.length>=6){$('parade-next').style.display='block';soundFanfare();showMiniCelebration('🎉 You met all heroes!');}
+  }
+}
+
+let lastMatchPiece=null;
+function renderPieceMatch(step,content){
+  let available=PIECES.filter(p=>p!==lastMatchPiece);const piece=available[Math.floor(Math.random()*available.length)];lastMatchPiece=piece;
+  const clue=piece.clues[Math.floor(Math.random()*piece.clues.length)];
+  const others=PIECES.filter(p=>p.name!==piece.name).sort(()=>Math.random()-.5).slice(0,3);const options=[piece,...others].sort(()=>Math.random()-.5);
+  let grid='<div class="piece-grid" style="grid-template-columns:repeat(2,1fr)">';
+  options.forEach(p=>{grid+=`<div class="piece-card" onclick="checkMatch('${p.name}','${piece.name}',this)"><span class="piece-card-emoji">${p.emoji}</span><div class="piece-card-name">${p.name}</div><div class="piece-card-role">${p.role}</div></div>`;});grid+='</div>';
+  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="lesson-speech" style="font-size:1rem;margin-top:.5rem">${clue}</div></div>${grid}<div id="match-next" style="display:none"><button class="btn-next" onclick="nextStep()">🌟 Next!</button></div>`;
+}
+
+function checkMatch(chosen,correct,el){
+  if(chosen===correct){el.classList.add('correct');soundCorrect();state.practiceCorrect++;state.totalQuizCorrect++;addCoins(5);$('lesson-coins').textContent=state.coins;$('match-next').style.display='block';showMiniCelebration('🎯 Correct! Amazing!');}
+  else{el.classList.add('wrong-card');soundWrong();setTimeout(()=>el.classList.remove('wrong-card'),500);}
+}
+
+function renderQuiz(step,content){
+  let opts='';step.options.forEach((o,i)=>{opts+=`<div class="piece-card" style="grid-column:span 1;padding:.8rem;" onclick="checkQuiz(${i},${step.correct},this,'${(step.praise||'').replace(/'/g,'\\\'')}')"><div class="piece-card-name" style="font-size:1rem">${o}</div></div>`;});
+  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="lesson-speech" style="font-size:1rem;margin-top:.5rem">${step.question}</div></div><div class="piece-grid" style="grid-template-columns:repeat(2,1fr)">${opts}</div><div id="quiz-next" style="display:none"><button class="btn-next" onclick="nextStep()">✅ Next!</button></div>`;
+}
+
+function checkQuiz(idx,correct,el,praise){
+  if(idx===correct){el.classList.add('correct');soundCorrect();state.totalQuizCorrect++;addCoins(5);$('lesson-coins').textContent=state.coins;$('quiz-next').style.display='block';showMiniCelebration(praise||'🎯 Correct!');}
+  else{el.classList.add('wrong-card');soundWrong();setTimeout(()=>el.classList.remove('wrong-card'),500);}
+}
+
+function renderMovementGame(step,content,pieceType){
+  const startPositions={rook:[3,3],bishop:[3,3],queen:[3,3],knight:[4,4]};
+  const [sr,sc]=startPositions[pieceType];
+  state.moveGame={pieceType,row:sr,col:sc,visited:new Set([`${sr}-${sc}`]),goal:step.goal,coins:0};
+  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="game-instruction">${step.instruction} <span class="hl">(<span id="move-count">0</span>/${step.goal} squares!)</span></div></div><div class="board-wrap" id="move-board-wrap"></div><div id="move-next" style="display:none"><button class="btn-next" onclick="nextStep()">🌟 Excellent! Next!</button></div>`;
+  renderMovementBoard();
+}
+
+function renderMovementBoard(){
+  const mg=state.moveGame;const moves=getValidMoves(mg.pieceType,mg.row,mg.col);const moveSet=new Set(moves.map(([r,c])=>`${r}-${c}`));
+  let html='<div class="chess-board">';
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const light=(r+c)%2===0;const key=`${r}-${c}`;const isPiece=(r===mg.row&&c===mg.col);const isMove=moveSet.has(key);const wasVisited=mg.visited.has(key)&&!isPiece;const pieceEmoji={rook:'♖',bishop:'♗',queen:'♕',knight:'♘'}[mg.pieceType];
+    html+=`<div class="cell ${light?'light':'dark'} ${isMove?'target':''} ${wasVisited?'highlight':''}" onclick="movePieceTo(${r},${c})">${isPiece?`<span class="cell-piece" style="font-size:1.6rem">${pieceEmoji}</span>`:''}</div>`;
+  }
+  html+='</div>';$('move-board-wrap').innerHTML=html;
+}
+
+function getValidMoves(pt,row,col){
+  const m=[];
+  if(pt==='rook'){for(let r=0;r<8;r++)if(r!==row)m.push([r,col]);for(let c=0;c<8;c++)if(c!==col)m.push([row,c]);}
+  else if(pt==='bishop'){for(let d=1;d<8;d++){[[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([dr,dc])=>{const nr=row+dr*d,nc=col+dc*d;if(nr>=0&&nr<8&&nc>=0&&nc<8)m.push([nr,nc]);});}}
+  else if(pt==='queen'){for(let r=0;r<8;r++)if(r!==row)m.push([r,col]);for(let c=0;c<8;c++)if(c!==col)m.push([row,c]);for(let d=1;d<8;d++){[[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([dr,dc])=>{const nr=row+dr*d,nc=col+dc*d;if(nr>=0&&nr<8&&nc>=0&&nc<8)m.push([nr,nc]);});}}
+  else if(pt==='knight'){[[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]].forEach(([dr,dc])=>{const nr=row+dr,nc=col+dc;if(nr>=0&&nr<8&&nc>=0&&nc<8)m.push([nr,nc]);});}
+  return m;
+}
+
+function movePieceTo(r,c){
+  const mg=state.moveGame;const moves=getValidMoves(mg.pieceType,mg.row,mg.col);
+  if(!moves.some(([mr,mc])=>mr===r&&mc===c))return;
+  mg.row=r;mg.col=c;
+  if(!mg.visited.has(`${r}-${c}`)){
+    mg.visited.add(`${r}-${c}`);mg.coins++;addCoins(3);$('lesson-coins').textContent=state.coins;
+    const count=mg.visited.size-1;if($('move-count'))$('move-count').textContent=count;soundPlace();
+    if(count>=mg.goal){soundFanfare();if($('move-next'))$('move-next').style.display='block';}
+  }
+  renderMovementBoard();
+}
+
+function renderRookCapture(step,content){
+  const treasures=[[1,6],[6,1],[1,1],[6,6]];state.rookCapture={row:3,col:3,treasures:new Set(treasures.map(t=>t.join('-')))};
+  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="game-instruction">${step.instruction} <span class="hl">(<span id="cap-count">0</span>/4 captured!)</span></div></div><div class="board-wrap" id="cap-board-wrap"></div><div id="cap-next" style="display:none"><button class="btn-next" onclick="nextStep()">🎯 You got them all! Next!</button></div>`;
+  renderCaptureBoard();
+}
+
+function renderCaptureBoard(){
+  const rc=state.rookCapture;const moves=getValidMoves('rook',rc.row,rc.col);const moveSet=new Set(moves.map(([r,c])=>`${r}-${c}`));
+  let html='<div class="chess-board">';
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const light=(r+c)%2===0;const key=`${r}-${c}`;const isPiece=(r===rc.row&&c===rc.col);const isT=rc.treasures.has(key);const isMove=moveSet.has(key);
+    html+=`<div class="cell ${light?'light':'dark'} ${isMove&&!isT?'target':''}" onclick="rookCaptureTo(${r},${c})">${isPiece?'<span class="cell-piece">♖</span>':''}${isT?'<span class="cell-piece">🪙</span>':''}</div>`;
+  }
+  html+='</div>';$('cap-board-wrap').innerHTML=html;
+}
+
+function rookCaptureTo(r,c){
+  const rc=state.rookCapture;const moves=getValidMoves('rook',rc.row,rc.col);
+  if(!moves.some(([mr,mc])=>mr===r&&mc===c))return;
+  rc.row=r;rc.col=c;const key=`${r}-${c}`;
+  if(rc.treasures.has(key)){rc.treasures.delete(key);addCoins(10);$('lesson-coins').textContent=state.coins;soundCoin();$('cap-count').textContent=4-rc.treasures.size;if(rc.treasures.size===0){soundFanfare();$('cap-next').style.display='block';}}else soundPlace();
+  renderCaptureBoard();
+}
+
+function renderPawnMarch(step,content){
+  state.pawnGame={row:6,col:3,moved:0,goal:step.goal,firstMove:true};
+  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="game-instruction">${step.instruction} <span class="hl">(<span id="pawn-moved">0</span>/${step.goal} steps!)</span></div></div><div class="board-wrap" id="pawn-board-wrap"></div><div id="pawn-next" style="display:none"><button class="btn-next" onclick="nextStep()">⚔️ March on! Next!</button></div>`;
+  renderPawnBoard();
+}
+
+function renderPawnBoard(){
+  const pg=state.pawnGame;const targets=[];if(pg.row-1>=0)targets.push(`${pg.row-1}-${pg.col}`);if(pg.firstMove&&pg.row-2>=0)targets.push(`${pg.row-2}-${pg.col}`);
+  let html='<div class="chess-board">';
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const light=(r+c)%2===0;const key=`${r}-${c}`;const isPiece=(r===pg.row&&c===pg.col);const isTarget=targets.includes(key);
+    html+=`<div class="cell ${light?'light':'dark'} ${isTarget?'target':''}" onclick="movePawn(${r},${c})">${isPiece?'<span class="cell-piece">♙</span>':''}</div>`;
+  }
+  html+='</div>';$('pawn-board-wrap').innerHTML=html;
+}
+
+function movePawn(r,c){
+  const pg=state.pawnGame;const validR=[pg.row-1];if(pg.firstMove)validR.push(pg.row-2);
+  if(!validR.includes(r)||c!==pg.col)return;
+  pg.firstMove=false;pg.row=r;pg.moved++;addCoins(3);$('lesson-coins').textContent=state.coins;$('pawn-moved').textContent=pg.moved;soundPlace();
+  if(pg.moved>=pg.goal){soundFanfare();$('pawn-next').style.display='block';}
+  renderPawnBoard();
+}
+
+function renderPawnCapture(step,content){
+  state.pawnCapture={row:4,col:3,enemies:new Set(['3-2','3-4']),done:0};
+  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="game-instruction">${step.instruction} <span class="hl">(<span id="cap2-count">0</span>/2 captured!)</span></div></div><div class="board-wrap" id="pcap-board-wrap"></div><div id="pcap-next" style="display:none"><button class="btn-next" onclick="nextStep()">🗡️ Got them! Next!</button></div>`;
+  renderPawnCaptureBoard();
+}
+
+function renderPawnCaptureBoard(){
+  const pc=state.pawnCapture;let html='<div class="chess-board">';
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const light=(r+c)%2===0;const key=`${r}-${c}`;const isPiece=(r===pc.row&&c===pc.col);const isEnemy=pc.enemies.has(key);
+    html+=`<div class="cell ${light?'light':'dark'} ${isEnemy?'target':''}" onclick="pawnCapture(${r},${c})">${isPiece?'<span class="cell-piece">♙</span>':''}${isEnemy?'<span class="cell-piece" style="color:#e53e3e">♟</span>':''}</div>`;
+  }
+  html+='</div>';$('pcap-board-wrap').innerHTML=html;
+}
+
+function pawnCapture(r,c){
+  const pc=state.pawnCapture;const key=`${r}-${c}`;
+  if(r===pc.row-1&&(c===pc.col-1||c===pc.col+1)&&pc.enemies.has(key)){
+    pc.enemies.delete(key);pc.done++;addCoins(10);$('lesson-coins').textContent=state.coins;soundCoin();$('cap2-count').textContent=pc.done;
+    if(pc.enemies.size===0){soundFanfare();$('pcap-next').style.display='block';}
+    renderPawnCaptureBoard();
+  }
+}
+
+function renderPawnPromote(step,content){
+  state.pawnPromote={row:6,col:4,promoted:false};
+  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="game-instruction">${step.instruction} <span class="hl" id="promote-status">Keep marching!</span></div></div><div class="board-wrap" id="promote-board-wrap"></div><div id="promote-next" style="display:none"><button class="btn-next" onclick="nextStep()">👑 I am a Queen! Next!</button></div>`;
+  renderPromoteBoard();
+}
+
+function renderPromoteBoard(){
+  const pp=state.pawnPromote;let html='<div class="chess-board">';
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const light=(r+c)%2===0;const isPiece=(r===pp.row&&c===pp.col);const isTarget=(!pp.promoted&&r===pp.row-1&&c===pp.col);
+    html+=`<div class="cell ${light?'light':'dark'} ${isTarget?'target':''}" onclick="marchPawn(${r},${c})">${isPiece?(pp.promoted?'<span class="cell-piece">♕</span>':'<span class="cell-piece">♙</span>'):''}</div>`;
+  }
+  html+='</div>';$('promote-board-wrap').innerHTML=html;
+}
+
+function marchPawn(r,c){
+  const pp=state.pawnPromote;if(pp.promoted||r!==pp.row-1||c!==pp.col)return;
+  pp.row=r;addCoins(5);$('lesson-coins').textContent=state.coins;soundPlace();
+  if(pp.row===0){pp.promoted=true;$('promote-status').textContent='🎉 QUEEN!';soundFanfare();launchConfetti();$('promote-next').style.display='block';}
+  renderPromoteBoard();
+}
+
+function renderKingMove(step,content){
+  state.kingGame={row:4,col:4,visited:new Set(['4-4']),goal:step.goal};
+  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="game-instruction">${step.instruction} <span class="hl">(<span id="king-count">0</span>/${step.goal} squares!)</span></div></div><div class="board-wrap" id="king-board-wrap"></div><div id="king-next" style="display:none"><button class="btn-next" onclick="nextStep()">👑 Majestic! Next!</button></div>`;
+  renderKingBoard();
+}
+
+function renderKingBoard(){
+  const kg=state.kingGame;const dirs=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];const moves=dirs.map(([dr,dc])=>[kg.row+dr,kg.col+dc]).filter(([r,c])=>r>=0&&r<8&&c>=0&&c<8);const moveSet=new Set(moves.map(([r,c])=>`${r}-${c}`));
+  let html='<div class="chess-board">';
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const light=(r+c)%2===0;const key=`${r}-${c}`;const isPiece=(r===kg.row&&c===kg.col);const isMove=moveSet.has(key);const wasVisited=kg.visited.has(key)&&!isPiece;
+    html+=`<div class="cell ${light?'light':'dark'} ${isMove?'target':''} ${wasVisited?'highlight':''}" onclick="moveKing(${r},${c})">${isPiece?'<span class="cell-piece">♔</span>':''}</div>`;
+  }
+  html+='</div>';$('king-board-wrap').innerHTML=html;
+}
+
+function moveKing(r,c){
+  const kg=state.kingGame;const dr=Math.abs(r-kg.row),dc=Math.abs(c-kg.col);
+  if(dr>1||dc>1||(!dr&&!dc))return;
+  kg.row=r;kg.col=c;
+  if(!kg.visited.has(`${r}-${c}`)){kg.visited.add(`${r}-${c}`);addCoins(3);$('lesson-coins').textContent=state.coins;const count=kg.visited.size-1;$('king-count').textContent=count;soundPlace();if(count>=kg.goal){soundFanfare();$('king-next').style.display='block';}}
+  renderKingBoard();
+}
+
+function renderSafeSquare(step,content){
+  state.safeGame={kingR:7,kingC:4,safe:new Set(['7-3','7-5'])};
+  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="lesson-speech" style="color:#FF6B6B;font-size:1rem">⚠️ The enemy Rook is on the same column!</div><div class="game-instruction" style="margin-top:.5rem">${step.instruction}</div></div><div class="board-wrap" id="safe-board-wrap"></div><div id="safe-next" style="display:none"><button class="btn-next" onclick="nextStep()">🛡️ King is safe! Next!</button></div>`;
+  renderSafeBoard();
+}
+
+function renderSafeBoard(){
+  const sg=state.safeGame;let html='<div class="chess-board">';
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const light=(r+c)%2===0;const isKing=(r===sg.kingR&&c===sg.kingC);const isRook=(r===2&&c===sg.kingC);const isThreat=(c===sg.kingC&&!isKing&&!isRook);const isSafe=sg.safe.has(`${r}-${c}`);
+    const bg=isThreat?'background:rgba(255,80,80,.25)!important;':isSafe?'background:rgba(100,255,100,.4)!important;':'';
+    html+=`<div class="cell ${light?'light':'dark'}" style="${bg}" onclick="escapeCheck(${r},${c})">${isKing?'<span class="cell-piece">♔</span>':''}${isRook?'<span class="cell-piece" style="color:#e53e3e">♜</span>':''}</div>`;
+  }
+  html+='</div>';$('safe-board-wrap').innerHTML=html;
+}
+
+function escapeCheck(r,c){
+  const sg=state.safeGame;
+  if(sg.safe.has(`${r}-${c}`)){sg.kingR=r;sg.kingC=c;sg.safe.clear();addCoins(15);$('lesson-coins').textContent=state.coins;soundCorrect();soundFanfare();launchConfetti();$('safe-next').style.display='block';renderSafeBoard();}
+  else if(r!==sg.kingR||c!==sg.kingC){soundWrong();showMiniCelebration('⚠️ Dangerous!');}
+}
+
+function renderCentreControl(step,content){
+  state.centreGame={claimed:new Set(),targets:new Set(['3-3','3-4','4-3','4-4'])};
+  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="game-instruction">${step.instruction} <span class="hl">(<span id="centre-count">0</span>/4 claimed!)</span></div></div><div class="board-wrap" id="centre-board-wrap"></div><div id="centre-next" style="display:none"><button class="btn-next" onclick="nextStep()">🎯 Centre controlled!</button></div>`;
+  renderCentreBoard();
+}
+
+function renderCentreBoard(){
+  const cg=state.centreGame;let html='<div class="chess-board">';
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const light=(r+c)%2===0;const key=`${r}-${c}`;const isCentre=cg.targets.has(key);const isClaimed=cg.claimed.has(key);
+    html+=`<div class="cell ${light?'light':'dark'} ${isCentre&&!isClaimed?'target':''} ${isClaimed?'highlight':''}" onclick="claimCentre('${key}')">${isClaimed?'<span class="cell-piece">⭐</span>':''}</div>`;
+  }
+  html+='</div>';$('centre-board-wrap').innerHTML=html;
+}
+
+function claimCentre(key){
+  const cg=state.centreGame;if(cg.targets.has(key)&&!cg.claimed.has(key)){cg.claimed.add(key);addCoins(8);$('lesson-coins').textContent=state.coins;soundCoin();$('centre-count').textContent=cg.claimed.size;if(cg.claimed.size>=4){soundFanfare();$('centre-next').style.display='block';}renderCentreBoard();}
+}
+
+function renderOpeningSequence(step,content){
+  state.openingGame={step:0,moves:[{r:4,c:4,piece:'♙',label:'Pawn to e4!'},{r:4,c:3,piece:'♙',label:'Pawn to d4!'},{r:5,c:5,piece:'♘',label:'Knight out!'}],placed:[]};
+  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="game-instruction">${step.instruction} <span class="hl" id="opening-hint">Tap the glowing square!</span></div></div><div class="board-wrap" id="opening-board-wrap"></div><div id="opening-next" style="display:none"><button class="btn-next" onclick="nextStep()">♟️ Opening played!</button></div>`;
+  renderOpeningBoard();
+}
+
+function renderOpeningBoard(){
+  const og=state.openingGame;const next=og.moves[og.step];let html='<div class="chess-board">';
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const light=(r+c)%2===0;const isNext=(next&&r===next.r&&c===next.c);const placed=og.placed.find(p=>p.r===r&&p.c===c);
+    html+=`<div class="cell ${light?'light':'dark'} ${isNext?'target':''}" onclick="playOpening(${r},${c})">${placed?`<span class="cell-piece">${placed.piece}</span>`:''}</div>`;
+  }
+  html+='</div>';$('opening-board-wrap').innerHTML=html;
+}
+
+function playOpening(r,c){
+  const og=state.openingGame;if(og.step>=og.moves.length)return;const next=og.moves[og.step];
+  if(r===next.r&&c===next.c){
+    og.placed.push({r,c,piece:next.piece});og.step++;addCoins(8);$('lesson-coins').textContent=state.coins;soundPlace();
+    if(og.step>=og.moves.length){soundFanfare();$('opening-hint').textContent='Perfect!';$('opening-next').style.display='block';}else $('opening-hint').textContent=`Move ${og.step+1}`;
+    renderOpeningBoard();
+  } else soundWrong();
+}
+
+function renderTreasureCapture(step,content){
+  state.treasureCapture={playerR:4,playerC:0,enemyR:4,enemyC:5,done:false};
+  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="game-instruction">${step.instruction} <span class="hl" id="treasure-hint">The Rook slides right!</span></div></div><div class="board-wrap" id="treasure-board-wrap"></div><div id="treasure-next" style="display:none"><button class="btn-next" onclick="nextStep()">💎 Got it!</button></div>`;
+  renderTreasureBoard();
+}
+
+function renderTreasureBoard(){
+  const tc=state.treasureCapture;let html='<div class="chess-board">';
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const light=(r+c)%2===0;const isPlayer=(r===tc.playerR&&c===tc.playerC);const isEnemy=(!tc.done&&r===tc.enemyR&&c===tc.enemyC);const isTarget=(!tc.done&&r===tc.playerR&&c===tc.enemyC);
+    html+=`<div class="cell ${light?'light':'dark'} ${isTarget?'target':''}" onclick="captureFreePiece(${r},${c})">${isPlayer?'<span class="cell-piece">♖</span>':''}${isEnemy?'<span class="cell-piece" style="color:#e53e3e">♟</span>':''}</div>`;
+  }
+  html+='</div>';$('treasure-board-wrap').innerHTML=html;
+}
+
+function captureFreePiece(r,c){
+  const tc=state.treasureCapture;
+  if(!tc.done&&r===tc.playerR&&c===tc.enemyC){
+    tc.playerC=c;tc.done=true;addCoins(20);$('lesson-coins').textContent=state.coins;soundCoin();soundFanfare();launchConfetti();$('treasure-hint').textContent='Genius!';$('treasure-next').style.display='block';renderTreasureBoard();
+  } else if(!tc.done) soundWrong();
+}
+
+function renderChampionBoard(step,content){
+  state.championGame={row:7,col:4,moved:0,goal:step.goal};
+  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="game-instruction">${step.instruction} <span class="hl">(<span id="champ-count">0</span>/${step.goal} moves!)</span></div></div><div class="board-wrap" id="champ-board-wrap"></div><div id="champ-next" style="display:none"><button class="btn-next" onclick="nextStep()">🏆 Champion! Next!</button></div>`;
+  renderChampionBoardUI();
+}
+
+function renderChampionBoardUI(){
+  const cg=state.championGame;const dirs=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];const moves=dirs.map(([dr,dc])=>[cg.row+dr,cg.col+dc]).filter(([r,c])=>r>=0&&r<8&&c>=0&&c<8);const moveSet=new Set(moves.map(([r,c])=>`${r}-${c}`));
+  let html='<div class="chess-board">';
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const light=(r+c)%2===0;const key=`${r}-${c}`;const isPiece=(r===cg.row&&c===cg.col);const isMove=moveSet.has(key);
+    html+=`<div class="cell ${light?'light':'dark'} ${isMove?'target':''}" onclick="championMove(${r},${c})">${isPiece?'<span class="cell-piece">♔</span>':''}</div>`;
+  }
+  html+='</div>';$('champ-board-wrap').innerHTML=html;
+}
+
+function championMove(r,c){
+  const cg=state.championGame;const dr=Math.abs(r-cg.row),dc=Math.abs(c-cg.col);if(dr>1||dc>1||(!dr&&!dc))return;
+  cg.row=r;cg.col=c;cg.moved++;addCoins(5);$('lesson-coins').textContent=state.coins;soundPlace();$('champ-count').textContent=cg.moved;
+  if(cg.moved>=cg.goal){soundFanfare();launchConfetti();$('champ-next').style.display='block';}
+  renderChampionBoardUI();
+}
+
+function renderMiniGameQuiz(step,content){
+  state.mqQuiz={idx:0,questions:step.questions,correct:0};
+  renderMQQuestion(content);
+}
+
+function renderMQQuestion(content){
+  const mq=state.mqQuiz;if(!content)content=$('lesson-content');
+  if(mq.idx>=mq.questions.length){
+    content.innerHTML=`<div class="lesson-card" style="text-align:center"><span class="lesson-emoji">🏆</span><div class="lesson-heading">Quiz Complete!</div><div class="lesson-text">You got ${mq.correct}/${mq.questions.length} correct!</div></div><button class="btn-next" onclick="nextStep()">🌟 Next!</button>`;
+    soundFanfare();launchConfetti();return;
+  }
+  const q=mq.questions[mq.idx];let opts='';
+  q.opts.forEach((o,i)=>{opts+=`<div class="piece-card" style="padding:.8rem" onclick="answerMQ(${i},${q.correct},'${(q.praise||'').replace(/'/g,"\\'")}')"><div class="piece-card-name" style="font-size:1rem">${o}</div></div>`;});
+  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">Question ${mq.idx+1} of ${mq.questions.length}!</div><div class="lesson-speech" style="font-size:1rem;margin-top:.5rem">${q.q}</div></div><div class="piece-grid" style="grid-template-columns:repeat(2,1fr)">${opts}</div>`;
+}
+
+function answerMQ(chosen,correct,praise){
+  const mq=state.mqQuiz;
+  if(chosen===correct){
+    mq.correct++;mq.idx++;addCoins(10);$('lesson-coins').textContent=state.coins;soundCorrect();showMiniCelebration(praise||'🎯 Correct!');setTimeout(()=>renderMQQuestion($('lesson-content')),1200);
+  } else {
+    soundWrong();showMiniCelebration('💡 Try again!');document.querySelectorAll('.piece-card').forEach((el,i)=>{if(i===chosen){el.classList.add('wrong-card');setTimeout(()=>el.classList.remove('wrong-card'),500);}});
+  }
+}
+
+// ==== REWARD & PROGRESS ====
+function completePractice(){
+  state.practiceRounds++;state.stars+=1;state.xp+=20;addCoins(10);
+  if(state.practiceRounds>=5&&!state.earnedBadges.includes('practice_hero'))state.earnedBadges.push('practice_hero');
+  $('reward-emoji').textContent='🔁';$('reward-title').textContent='Practice Done!';$('reward-subtitle').textContent=`Round ${state.practiceRounds} complete!`;$('xp-gained').textContent=`+20 XP • +1 ⭐ • +10 🪙`;
+  const ph=state.earnedBadges.includes('practice_hero')&&state.practiceRounds===5;
+  if(ph){$('badge-earned').style.display='flex';$('badge-name').textContent='🔁 Practice Hero';$('badge-desc').textContent='Completed 5 practice rounds!';}else $('badge-earned').style.display='none';
+  soundFanfare();launchConfetti();state.practiceMode=true;showScreen('screen-reward');
+}
+
+function completeLesson(){
+  const lessonId=state.currentLesson.id;const w=state.currentWorld;
+  const allLessons={1:WORLD1_LESSONS,2:WORLD2_LESSONS,3:WORLD3_LESSONS,4:WORLD4_LESSONS,5:WORLD5_LESSONS,6:WORLD6_LESSONS,7:WORLD7_LESSONS,8:WORLD8_LESSONS,9:WORLD9_LESSONS};
+  const lessons=allLessons[w]||[];
+  if(!state.completedLessons.includes(lessonId)){
+    state.completedLessons.push(lessonId);state.worldProgress[w]=Math.min((state.worldProgress[w]||0)+1,lessons.length||3);state.stars+=3;state.xp+=50;
+  }
+  const badgeMap={'w1l1':'board_explorer','w1l2':'piece_master','w1l3':'world1_champ','w2l3':'rook_master','w3l3':'bishop_wizard','w4l3':'queen_commander','w5l3':'knight_champion','w6l3':'pawn_hero','w7l3':'king_guardian','w8l3':'battle_graduate','w9l3':'grand_champion'};
+  let badge=null;const newBadgeId=badgeMap[lessonId];
+  if(newBadgeId&&!state.earnedBadges.includes(newBadgeId)){state.earnedBadges.push(newBadgeId);badge=BADGES.find(b=>b.id===newBadgeId);}
+  const praises=[['🏆','AMAZING!','You are a Chess Explorer!'],['🏯','BRILLIANT!','The Rook salutes you!'],['🧙','MAGICAL!','The Wizard bows to you!'],['👸','ROYAL!','The Queen cheers!'],['🐴','LEGENDARY!','The Knight leaps for joy!'],['⚔️','HEROIC!','The Pawn army salutes!'],['👑','MAJESTIC!','The King is safe!'],['🛡️','STRATEGIC!','Battle Academy graduate!'],['🏆','GRAND CHAMPION!','The Kingdom bows before you!']];
+  const msg=praises[Math.min(w-1,8)];
+  $('reward-emoji').textContent=msg[0];$('reward-title').textContent=msg[1];$('reward-subtitle').textContent=msg[2];$('xp-gained').textContent=`+50 XP • +3 ⭐ • +${state.coins} 🪙`;
+  if(badge){$('badge-earned').style.display='flex';$('badge-name').textContent=badge.emoji+' '+badge.name;$('badge-desc').textContent=badge.desc;}else $('badge-earned').style.display='none';
+  soundFanfare();launchConfetti();showScreen('screen-reward');
+}
+
+function afterReward(){
+  soundClick();if(state.practiceMode){startPractice();return;}
+  const w=state.currentWorld;
+  const allLessons={1:WORLD1_LESSONS,2:WORLD2_LESSONS,3:WORLD3_LESSONS,4:WORLD4_LESSONS,5:WORLD5_LESSONS,6:WORLD6_LESSONS,7:WORLD7_LESSONS,8:WORLD8_LESSONS,9:WORLD9_LESSONS};
+  const lessons=allLessons[w];const wp=state.worldProgress[w]||0;
+  if(lessons&&wp<lessons.length) startLesson(lessons[Math.min(wp,lessons.length-1)]); else showHome();
+}
+
+function showDashboard(){
+  soundClick();$('dash-child-name').textContent=`Tracking progress for ${state.heroName} 🌟`;
+  $('dash-lessons').textContent=state.completedLessons.length;$('dash-stars').textContent=state.stars;$('dash-coins').textContent=state.coins;$('dash-streak').textContent=state.streak;
+  const wp=$('dash-world-progress');wp.innerHTML='';const barColors=['#8B5CF6','#3B82F6','#10B981','#EC4899','#F59E0B','#EF4444','#6366F1','#0EA5E9','#D97706'];
+  WORLDS.forEach(w=>{
+    const done=state.worldProgress[w.id]||0;const pct=Math.round((done/w.lessons)*100);
+    wp.innerHTML+=`<div class="world-progress-row"><span style="font-size:1.4rem;flex-shrink:0">${w.emoji}</span><div style="flex:1"><div style="font-weight:700;color:#1a1a2e;font-size:.9rem">World ${w.id}: ${w.name}</div><div class="world-mini-bar"><div class="world-mini-fill" style="width:${pct}%;background:${barColors[w.id-1]}"></div></div></div><span style="font-weight:700;color:#1a1a2e;font-size:.85rem">${done}/${w.lessons}</span></div>`;
+  });
+  $('dash-practice-stats').innerHTML=`<div style="display:flex;gap:1rem;flex-wrap:wrap"><div style="background:#F3F4F6;border-radius:12px;padding:.7rem 1rem;text-align:center"><div style="font-family:'Fredoka One',cursive;font-size:1.5rem;color:#1a1a2e">${state.practiceRounds}</div><div style="color:#888;font-size:.75rem;font-weight:700">Rounds Done</div></div><div style="background:#F3F4F6;border-radius:12px;padding:.7rem 1rem;text-align:center"><div style="font-family:'Fredoka One',cursive;font-size:1.5rem;color:#1a1a2e">${state.totalQuizCorrect}</div><div style="color:#888;font-size:.75rem;font-weight:700">Quiz Correct</div></div></div>`;
+  $('dash-badges').innerHTML=state.earnedBadges.length===0?'<div style="color:#888;font-size:.9rem">Complete lessons to earn badges!</div>':state.earnedBadges.map(id=>{const b=BADGES.find(x=>x.id===id);return b?`<div style="background:#F3F4F6;border-radius:12px;padding:.5rem .8rem;display:flex;align-items:center;gap:.4rem;font-size:.85rem;font-weight:700">${b.emoji} ${b.name}</div>`:''}).join('');
+  showScreen('screen-dashboard');
+}
+
+function showTrophies(){
+  soundClick();$('lesson-title-header').textContent='🏆 Trophy Room';
+  $('lesson-content').innerHTML=`<div class="lesson-card"><span class="lesson-emoji">🏆</span><div class="lesson-heading">Your Trophies</div><div class="lesson-text">Complete more lessons and practice rounds to earn all the badges!</div></div><div style="width:100%;display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;">${BADGES.map(b=>{const earned=state.earnedBadges.includes(b.id);return `<div class="piece-card" style="${earned?'border-color:#FFD700;background:rgba(255,215,0,.15)':'opacity:.4'}"><span class="piece-card-emoji">${earned?b.emoji:'🔒'}</span><div class="piece-card-name">${b.name}</div><div class="piece-card-role">${earned?'✅ Earned':'Locked'}</div></div>`;}).join('')}</div><button class="btn-next" onclick="showHome()">⬅️ Back</button>`;
+  showScreen('screen-lesson');
+}
+
+initStars();
+</script>
+</body>
+</html>
