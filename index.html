@@ -301,7 +301,7 @@ function soundPlace(){playTone(400,.08,'triangle',.2,0);playTone(600,.12,'sine',
 
 // ============ TEXT TO SPEECH (Gemini AI Studio) ============
 async function speakText(text) {
-  if (isMuted) return;
+  if (isMuted || !text) return;
   
   if (currentAudio) {
     currentAudio.pause();
@@ -391,7 +391,7 @@ const TITLES=['Pawn Explorer','Knight Jumper','Castle Defender','Bishop Seeker',
 
 // ============ LESSON DATA ============
 const WORLD1_LESSONS=[
-  {id:'w1l1',title:'The Magical Board',steps:[{type:'story',emoji:'🏰',heading:'Welcome to Chess Kingdom!',text:'A long time ago, in a magical kingdom far away... two armies faced each other on a great battle board!',speech:'[whispers] Every square on this board is a magical land... [laughs] where our heroes live!'},{type:'board-explore',heading:'Touch the Magic Board!',instruction:'Tap any square on the board to light it up!',goal:5},{type:'quiz',heading:'Quick Question! 🧠',question:'How many squares are on a chess board?',options:['32','64','100','48'],correct:1,praise:'Yes! 64 squares — 8 rows of 8! You are SO smart!'}]},
+  {id:'w1l1',title:'The Magical Board',steps:[{type:'story',emoji:'🏰',heading:'Welcome to Chess Kingdom!',text:'Welcome to Chess Kingdom!',speech:'[whispers] A long time ago, in a magical kingdom far away... two armies faced each other on a great battle board! [laughs] Every square on this board is a magical land... where our heroes live!'},{type:'board-explore',heading:'Touch the Magic Board!',instruction:'Tap any square on the board to light it up!',goal:5},{type:'quiz',heading:'Quick Question! 🧠',question:'How many squares are on a chess board?',options:['32','64','100','48'],correct:1,praise:'Yes! 64 squares — 8 rows of 8! You are SO smart!'}]},
   {id:'w1l2',title:'Meet the Chess Heroes!',steps:[{type:'piece-parade',heading:'The Chess Heroes!',instruction:'Tap each hero to meet them!'},{type:'piece-match',heading:'Who Am I? 🎭',instruction:'Read the clue and find the right hero!'}]},
   {id:'w1l3',title:'Set Up the Kingdom!',steps:[{type:'board-place',heading:'Place the Pawns!',instruction:'Tap the glowing squares to place your brave soldiers!'},{type:'story',emoji:'🌟',heading:'World 1 Complete!',text:'You have explored the Chess Kingdom! You know the board, you know the heroes, and you placed the pawn army!'}]}
 ];
@@ -550,6 +550,7 @@ function renderStep(){
   const lesson=state.currentLesson;const step=lesson.steps[state.currentStep];
   $('lesson-progress-bar').style.width=Math.round((state.currentStep/lesson.steps.length)*100)+'%';
   const content=$('lesson-content');content.innerHTML='';
+  
   if(step.type==='story')renderStory(step,content);
   else if(step.type==='board-explore')renderBoardExplore(step,content);
   else if(step.type==='board-place')renderBoardPlace(step,content);
@@ -571,6 +572,22 @@ function renderStep(){
   else if(step.type==='treasure-capture')renderTreasureCapture(step,content);
   else if(step.type==='champion-board')renderChampionBoard(step,content);
   else if(step.type==='mini-game-quiz')renderMiniGameQuiz(step,content);
+
+  // AUTOMATIC NARRATOR FOR ALL SCREENS EXCEPT CUSTOM ONES
+  setTimeout(() => {
+    let textToSpeak = '';
+    if (step.type === 'story') {
+      textToSpeak = step.text + (step.speech ? ' ' + step.speech : '');
+    } else if (step.instruction && step.type !== 'piece-match') {
+      textToSpeak = step.instruction;
+    } else if (step.question) {
+      textToSpeak = step.question;
+    }
+    
+    if (textToSpeak) {
+      speakText(textToSpeak);
+    }
+  }, 400);
 }
 
 function nextStep(){
@@ -589,13 +606,8 @@ function renderStory(step,content){
       <div class="lesson-text">${step.text}</div>
       ${step.speech?`<div class="lesson-speech">${step.speech.replace(/\[.*?\]/g, '')}</div>`:''}
     </div>
-    <button class="btn-next" onclick="soundClick();nextStep()">✨ Next!</button>
+    <button class="btn-next" style="margin-top:15px;" onclick="soundClick();nextStep()">✨ Next!</button>
   `;
-  
-  // Auto-play the audio slightly after the screen loads for perfect UX
-  setTimeout(() => {
-    speakText(step.text + (step.speech ? ' ' + step.speech : ''));
-  }, 400);
 }
 
 function buildBoard(targets){
@@ -623,7 +635,7 @@ function renderBoardPlace(step,content){
 function renderPieceParade(step,content){
   state.piecesDiscovered=[];let grid='<div class="piece-grid">';
   PIECES.forEach((p,i)=>{grid+=`<div class="piece-card" id="pc-${i}" onclick="revealPiece(${i})"><span class="piece-card-emoji">${p.emoji}</span><div class="piece-card-name">${p.name}</div><div class="piece-card-role">${p.role}</div></div>`;});grid+='</div>';
-  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="game-instruction">${step.instruction} <span class="hl">(<span id="piece-count">0</span>/6 met!)</span></div></div>${grid}<div id="piece-speech" class="lesson-card" style="display:none"><span class="lesson-emoji" id="piece-speech-emoji">♙</span><div class="lesson-heading" id="piece-speech-name">Pawn</div><div class="lesson-speech" id="piece-speech-text">Hi!</div></div><div id="parade-next" style="display:none"><button class="btn-next" onclick="nextStep()">🎉 I know them all! Next!</button></div>`;
+  content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="game-instruction">${step.instruction} <span class="hl">(<span id="piece-count">0</span>/6 met!)</span></div></div>${grid}<div id="piece-speech" class="lesson-card" style="display:none;margin-top:10px;"><span class="lesson-emoji" id="piece-speech-emoji" style="font-size:2rem;margin-bottom:5px;">♙</span><div class="lesson-heading" id="piece-speech-name" style="font-size:1.2rem;">Pawn</div><div class="lesson-speech" id="piece-speech-text" style="font-size:1rem;padding:10px;">Hi!</div></div><div id="parade-next" style="display:none;margin-top:10px;"><button class="btn-next" onclick="nextStep()">🎉 I know them all! Next!</button></div>`;
 }
 
 function revealPiece(idx){
@@ -643,7 +655,7 @@ function renderPieceMatch(step,content){
   let grid='<div class="piece-grid" style="grid-template-columns:repeat(2,1fr)">';
   options.forEach(p=>{grid+=`<div class="piece-card" onclick="checkMatch('${p.name}','${piece.name}',this)"><span class="piece-card-emoji">${p.emoji}</span><div class="piece-card-name">${p.name}</div><div class="piece-card-role">${p.role}</div></div>`;});grid+='</div>';
   content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="lesson-speech" style="font-size:1rem;margin-top:.5rem">${clue}</div></div>${grid}<div id="match-next" style="display:none"><button class="btn-next" onclick="nextStep()">🌟 Next!</button></div>`;
-  setTimeout(() => speakText(clue), 400);
+  setTimeout(() => speakText(clue), 400); // Reads the dynamic clue directly
 }
 
 function checkMatch(chosen,correct,el){
@@ -654,7 +666,6 @@ function checkMatch(chosen,correct,el){
 function renderQuiz(step,content){
   let opts='';step.options.forEach((o,i)=>{opts+=`<div class="piece-card" style="grid-column:span 1;padding:.8rem;" onclick="checkQuiz(${i},${step.correct},this,'${(step.praise||'').replace(/'/g,'\\\'')}')"><div class="piece-card-name" style="font-size:1rem">${o}</div></div>`;});
   content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">${step.heading}</div><div class="lesson-speech" style="font-size:1rem;margin-top:.5rem">${step.question}</div></div><div class="piece-grid" style="grid-template-columns:repeat(2,1fr)">${opts}</div><div id="quiz-next" style="display:none"><button class="btn-next" onclick="nextStep()">✅ Next!</button></div>`;
-  setTimeout(() => speakText(step.question), 400);
 }
 
 function checkQuiz(idx,correct,el,praise){
@@ -943,6 +954,7 @@ function renderMQQuestion(content){
   const q=mq.questions[mq.idx];let opts='';
   q.opts.forEach((o,i)=>{opts+=`<div class="piece-card" style="padding:.8rem" onclick="answerMQ(${i},${q.correct},'${(q.praise||'').replace(/'/g,"\\'")}')"><div class="piece-card-name" style="font-size:1rem">${o}</div></div>`;});
   content.innerHTML=`<div class="lesson-card"><div class="lesson-heading">Question ${mq.idx+1} of ${mq.questions.length}!</div><div class="lesson-speech" style="font-size:1rem;margin-top:.5rem">${q.q}</div></div><div class="piece-grid" style="grid-template-columns:repeat(2,1fr)">${opts}</div>`;
+  setTimeout(() => speakText(q.q), 400); // Reads the mini-game quiz question
 }
 
 function answerMQ(chosen,correct,praise){
