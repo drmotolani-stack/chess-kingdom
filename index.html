@@ -134,10 +134,13 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .practice-title{font-family:'Fredoka One',cursive;font-size:1.4rem;color:white;text-shadow:1px 1px 0 rgba(0,0,0,.2);}
 .practice-sub{color:rgba(255,255,255,.85);font-size:.85rem;font-weight:600;margin-top:.2rem;}
 .practice-emoji{font-size:2.2rem;position:absolute;right:1.2rem;top:50%;transform:translateY(-50%);}
+.btn-reset{width:100%;padding:1rem;border-radius:50px;border:2px solid #EF4444;background:rgba(239,68,68,0.1);color:#EF4444;font-family:'Fredoka One',cursive;font-size:1.2rem;cursor:pointer;margin-top:10px;transition:0.2s;}
+.btn-reset:active{background:#EF4444;color:white;}
 </style>
 </head>
 <body>
 <audio id="bg-music" loop src="bgmusic.mp3" playsinline></audio>
+<audio id="voice-player" playsinline></audio>
 <button id="mute-btn" class="mute-btn" onclick="toggleMute()">🔊</button>
 <div class="stars-bg" id="stars-bg"></div>
 
@@ -149,7 +152,7 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
     <label>What is your hero's name?</label>
     <input class="name-input" id="hero-name-input" type="text" placeholder="Type name here..." maxlength="12"/>
   </div>
-  <button class="btn-start" onclick="startJourney()">⚔️ Begin Adventure!</button>
+  <button class="btn-start" id="btn-begin-journey" onclick="startJourney()">⚔️ Begin Adventure!</button>
 </div>
 
 <div id="screen-home" class="screen">
@@ -231,6 +234,7 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
       <div id="dash-practice-stats"></div>
     </div>
     <button class="btn-dash-close" onclick="showHome()">⬅️ Back to Map</button>
+    <button class="btn-reset" onclick="resetGame()">⚠️ Reset All Progress</button>
   </div>
 </div>
 
@@ -242,8 +246,11 @@ function toggleMute() {
   isMuted = !isMuted;
   document.getElementById('mute-btn').textContent = isMuted ? '🔇' : '🔊';
   const bgMusic = document.getElementById('bg-music');
+  const voicePlayer = document.getElementById('voice-player');
+  
   if (bgMusic) bgMusic.muted = isMuted;
-  if (isMuted) window.speechSynthesis.cancel();
+  if (voicePlayer) voicePlayer.muted = isMuted;
+  if (isMuted) stopVoice();
 }
 
 let audioCtx = null;
@@ -260,42 +267,53 @@ function soundClick(){playTone(440,.06,'sine',.15);}
 function soundReveal(){playTone(660,.12,'sine',.2,0);playTone(880,.2,'sine',.2,.1);}
 function soundPlace(){playTone(400,.08,'triangle',.2,0);playTone(600,.12,'sine',.2,.07);}
 
-// ============ TEXT TO SPEECH (Browser Web Speech API) ============
-let voicesLoaded = false;
-let voicesList = [];
-
-// Load voices — they load async in Chrome
-function loadVoices() {
-  voicesList = window.speechSynthesis.getVoices();
-  if (voicesList.length > 0) voicesLoaded = true;
-}
-window.speechSynthesis.onvoiceschanged = loadVoices;
-loadVoices();
-
-function getBestVoice() {
-  const all = window.speechSynthesis.getVoices();
-  return all.find(v => v.name === 'Google UK English Female')
-    || all.find(v => v.name === 'Samantha')
-    || all.find(v => v.name.includes('Female') && v.lang.startsWith('en'))
-    || all.find(v => v.lang === 'en-GB')
-    || all.find(v => v.lang.startsWith('en-US'))
-    || all[0];
-}
-
-function speakText(text) {
-  if (isMuted || !text) return;
-  window.speechSynthesis.cancel();
+// ============ GOOGLE CLOUD TTS ============
+function stopVoice() {
+  const voicePlayer = document.getElementById('voice-player');
   const bgMusic = document.getElementById('bg-music');
+  if(voicePlayer) {
+    voicePlayer.pause();
+    voicePlayer.currentTime = 0;
+  }
+  if(bgMusic && !isMuted) bgMusic.volume = 0.15;
+}
+
+async function speakText(text) {
+  if (isMuted || !text) return;
+  stopVoice();
+  
+  const bgMusic = document.getElementById('bg-music');
+  const voicePlayer = document.getElementById('voice-player');
   if (bgMusic && !isMuted) bgMusic.volume = 0.05;
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.rate = 0.88;
-  utter.pitch = 1.05;
-  utter.volume = 1;
-  const voice = getBestVoice();
-  if (voice) utter.voice = voice;
-  utter.onend = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; };
-  utter.onerror = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; };
-  window.speechSynthesis.speak(utter);
+
+  // --- PASTE YOUR SECURE GOOGLE CLOUD API KEY HERE ---
+  const apiKey = 'AIzaSyANiUVdIrnK6P2QZrED9w6PPXBa0t6S1PA'; 
+  
+  const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
+  const payload = {
+    input: { text: text },
+    voice: { languageCode: 'en-US', name: 'en-US-Journey-D' }, 
+    audioConfig: { audioEncoding: 'MP3' }
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json();
+    if (data.audioContent) {
+      voicePlayer.src = 'data:audio/mp3;base64,' + data.audioContent;
+      voicePlayer.onended = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; }; 
+      voicePlayer.play().catch(e => console.log("Safari blocked autoplay", e));
+    } else {
+      if (bgMusic && !isMuted) bgMusic.volume = 0.15;
+    }
+  } catch (error) {
+    console.error("Voice error:", error);
+    if (bgMusic && !isMuted) bgMusic.volume = 0.15;
+  }
 }
 
 // ============ DATA ============
@@ -389,7 +407,7 @@ function getPracticeRound(){
   return pool[Math.floor(Math.random()*pool.length)];
 }
 
-// ============ STATE ============
+// ============ STATE & SAVE ENGINE ============
 let state={
   heroName:'',stars:0,coins:0,xp:0,streak:1,
   completedLessons:[],earnedBadges:[],
@@ -401,11 +419,50 @@ let state={
   pawnPromote:null,kingGame:null,safeGame:null,centreGame:null,openingGame:null,treasureCapture:null,championGame:null,mqQuiz:null
 };
 
+function saveProgress() {
+  const dataToSave = {
+    heroName: state.heroName,
+    stars: state.stars,
+    coins: state.coins,
+    xp: state.xp,
+    streak: state.streak,
+    completedLessons: state.completedLessons,
+    earnedBadges: state.earnedBadges,
+    worldProgress: state.worldProgress,
+    practiceRounds: state.practiceRounds,
+    practiceCorrect: state.practiceCorrect,
+    totalQuizCorrect: state.totalQuizCorrect
+  };
+  localStorage.setItem('chessKingdomState', JSON.stringify(dataToSave));
+}
+
+function loadProgress() {
+  try {
+    const saved = localStorage.getItem('chessKingdomState');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state = { ...state, ...parsed };
+      if (state.heroName) {
+        const nameInput = document.getElementById('hero-name-input');
+        if (nameInput) nameInput.value = state.heroName;
+        document.getElementById('btn-begin-journey').textContent = '⚔️ Continue Adventure!';
+      }
+    }
+  } catch(e) { console.error("Could not load progress", e); }
+}
+
+function resetGame() {
+  if(confirm("⚠️ Are you sure you want to erase all progress? This cannot be undone!")) {
+    localStorage.removeItem('chessKingdomState');
+    location.reload();
+  }
+}
+
 // ============ HELPERS ============
 function $(id){return document.getElementById(id);}
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');}
 function initStars(){const bg=$('stars-bg');for(let i=0;i<60;i++){const s=document.createElement('div');s.className='star';const size=Math.random()*3+1;s.style.cssText=`width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${1.5+Math.random()*2}s`;bg.appendChild(s);}}
-function addCoins(n){state.coins+=n;soundCoin();}
+function addCoins(n){state.coins+=n;soundCoin();saveProgress();}
 function showMiniCelebration(msg){const el=document.createElement('div');el.style.cssText=`position:fixed;top:20%;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#FFD700,#FFA500);color:#1a1a2e;font-family:'Fredoka One',cursive;font-size:1.2rem;padding:.7rem 1.5rem;border-radius:50px;z-index:500;pointer-events:none;animation:pop .3s ease;box-shadow:0 6px 20px rgba(255,215,0,.4);white-space:nowrap;`;el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),2000);}
 function launchConfetti(){const colors=['#FFD700','#FF6B6B','#4ECDC4','#A855F7','#3B82F6','#10B981'];for(let i=0;i<40;i++){const el=document.createElement('div');el.className='confetti-piece';el.style.cssText=`left:${20+Math.random()*60}%;top:${Math.random()*30}%;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'2px'};animation-delay:${Math.random()*.5}s;animation-duration:${1+Math.random()}s`;document.body.appendChild(el);setTimeout(()=>el.remove(),2000);}}
 
@@ -413,8 +470,18 @@ function launchConfetti(){const colors=['#FFD700','#FF6B6B','#4ECDC4','#A855F7',
 function startJourney(){
   const name=$('hero-name-input').value.trim()||'Hero';
   state.heroName=name;
-  // Unlock audio context on user gesture
+  saveProgress();
+  
   if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume();
+  
+  // Unlock voice player securely for Safari
+  const voicePlayer = document.getElementById('voice-player');
+  if (voicePlayer) {
+    voicePlayer.src = 'data:audio/mp3;base64,//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq';
+    voicePlayer.volume = 0.01;
+    voicePlayer.play().catch(e => {});
+  }
+
   const bgMusic=document.getElementById('bg-music');
   if(bgMusic&&!isMuted){bgMusic.volume=0.15;bgMusic.play().catch(e=>{});}
   soundFanfare();
@@ -422,7 +489,7 @@ function startJourney(){
 }
 
 function showHome(){
-  window.speechSynthesis.cancel();
+  stopVoice();
   updateHomeUI();renderWorlds();showScreen('screen-home');
 }
 
@@ -466,12 +533,14 @@ function startWorld(worldId){
 }
 
 function showComingSoon(worldId){
+  stopVoice();
   const w=WORLDS[worldId-1];$('lesson-title-header').textContent=w.name;
   $('lesson-content').innerHTML=`<div class="lesson-card" style="text-align:center;padding:2rem"><span class="lesson-emoji">${w.emoji}</span><div class="lesson-heading" style="color:white;margin:1rem 0">Coming Soon!</div><div class="lesson-text">World ${worldId} is being built by magical builders!</div></div><button class="btn-next" onclick="showHome()">⬅️ Back to Map</button>`;
   showScreen('screen-lesson');
 }
 
 function startPractice(){
+  stopVoice();
   state.practiceMode=true;
   state.currentLesson={id:'practice',title:'Practice Round ⭐',steps:[getPracticeRound()]};
   state.currentStep=0;state.lightedSquares=0;state.placedPawns=0;state.piecesDiscovered=[];
@@ -480,6 +549,7 @@ function startPractice(){
 }
 
 function startLesson(lesson){
+  stopVoice();
   state.practiceMode=false;state.currentLesson=lesson;state.currentStep=0;
   state.lightedSquares=0;state.placedPawns=0;state.piecesDiscovered=[];
   $('lesson-title-header').textContent=lesson.title;$('lesson-coins').textContent=state.coins;
@@ -513,7 +583,7 @@ function renderStep(){
   else if(step.type==='champion-board')renderChampionBoard(step,content);
   else if(step.type==='mini-game-quiz')renderMiniGameQuiz(step,content);
 
-  // Narrator — speaks the key text for each screen
+  // Narrator
   setTimeout(()=>{
     let textToSpeak='';
     if(step.type==='story') textToSpeak=step.text+(step.speech?' '+step.speech:'');
@@ -524,7 +594,7 @@ function renderStep(){
 }
 
 function nextStep(){
-  window.speechSynthesis.cancel();
+  stopVoice();
   soundClick();state.currentStep++;
   if(state.currentStep>=state.currentLesson.steps.length){
     if(state.practiceMode) completePractice(); else completeLesson();
@@ -897,7 +967,9 @@ function completePractice(){
   $('reward-emoji').textContent='🔁';$('reward-title').textContent='Practice Done!';$('reward-subtitle').textContent=`Round ${state.practiceRounds} complete!`;$('xp-gained').textContent=`+20 XP • +1 ⭐ • +10 🪙`;
   const ph=state.earnedBadges.includes('practice_hero')&&state.practiceRounds===5;
   if(ph){$('badge-earned').style.display='flex';$('badge-name').textContent='🔁 Practice Hero';$('badge-desc').textContent='Completed 5 practice rounds!';}else $('badge-earned').style.display='none';
-  soundFanfare();launchConfetti();state.practiceMode=true;showScreen('screen-reward');
+  soundFanfare();launchConfetti();state.practiceMode=true;
+  saveProgress();
+  showScreen('screen-reward');
 }
 
 function completeLesson(){
@@ -914,7 +986,9 @@ function completeLesson(){
   const msg=praises[Math.min(w-1,8)];
   $('reward-emoji').textContent=msg[0];$('reward-title').textContent=msg[1];$('reward-subtitle').textContent=msg[2];$('xp-gained').textContent=`+50 XP • +3 ⭐ • +${state.coins} 🪙`;
   if(badge){$('badge-earned').style.display='flex';$('badge-name').textContent=badge.emoji+' '+badge.name;$('badge-desc').textContent=badge.desc;}else $('badge-earned').style.display='none';
-  soundFanfare();launchConfetti();showScreen('screen-reward');
+  soundFanfare();launchConfetti();
+  saveProgress();
+  showScreen('screen-reward');
 }
 
 function afterReward(){
@@ -926,6 +1000,7 @@ function afterReward(){
 }
 
 function showDashboard(){
+  stopVoice();
   soundClick();$('dash-child-name').textContent=`Tracking progress for ${state.heroName} 🌟`;
   $('dash-lessons').textContent=state.completedLessons.length;$('dash-stars').textContent=state.stars;$('dash-coins').textContent=state.coins;$('dash-streak').textContent=state.streak;
   const wp=$('dash-world-progress');wp.innerHTML='';const barColors=['#8B5CF6','#3B82F6','#10B981','#EC4899','#F59E0B','#EF4444','#6366F1','#0EA5E9','#D97706'];
@@ -939,12 +1014,15 @@ function showDashboard(){
 }
 
 function showTrophies(){
+  stopVoice();
   soundClick();$('lesson-title-header').textContent='🏆 Trophy Room';
   $('lesson-content').innerHTML=`<div class="lesson-card"><span class="lesson-emoji">🏆</span><div class="lesson-heading">Your Trophies</div><div class="lesson-text">Complete more lessons and practice rounds to earn all the badges!</div></div><div style="width:100%;display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;">${BADGES.map(b=>{const earned=state.earnedBadges.includes(b.id);return `<div class="piece-card" style="${earned?'border-color:#FFD700;background:rgba(255,215,0,.15)':'opacity:.4'}"><span class="piece-card-emoji">${earned?b.emoji:'🔒'}</span><div class="piece-card-name">${b.name}</div><div class="piece-card-role">${earned?'✅ Earned':'Locked'}</div></div>`;}).join('')}</div><button class="btn-next" onclick="showHome()">⬅️ Back</button>`;
   showScreen('screen-lesson');
 }
 
+// Start up the background systems
 initStars();
+loadProgress();
 </script>
 </body>
 </html>
