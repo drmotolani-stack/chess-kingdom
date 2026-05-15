@@ -309,7 +309,7 @@ async function speakText(text) {
   const VOICE_NAME = 'Zephyr'; // change to Puck / Kore / Charon / Fenrir
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/`
-            + `gemini-2.5-flash-preview-tts:generateContent?key=${GEMINI_KEY}`;
+            + `gemini-2.5-flash-preview-0514:generateContent?key=${GEMINI_KEY}`;
 
   const payload = {
     contents: [{ parts: [{ text }] }],
