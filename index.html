@@ -97,7 +97,8 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .cell.light{background:#E2F0CB;border-radius:6px;box-shadow:inset 0 -3px 0 rgba(0,0,0,0.1);}
 .cell.dark{background:#88D49E;border-radius:6px;box-shadow:inset 0 -3px 0 rgba(0,0,0,0.1);}
 .cell.highlight{background:rgba(255,215,0,.6)!important;animation:pulse .5s ease;}
-.cell.target{background:rgba(255,215,0,.4)!important; border:3px solid var(--gold)!important; box-shadow:0 0 20px rgba(255,215,0,.8)!important; z-index:2; animation:glow 1.2s ease-in-out infinite!important;}.cell.wrong{animation:shake .4s ease;}
+.cell.target{background:rgba(255,215,0,.4)!important; border:3px solid var(--gold)!important; box-shadow:0 0 20px rgba(255,215,0,.8)!important; z-index:2; animation:glow 1.2s ease-in-out infinite!important;}
+.cell.wrong{animation:shake .4s ease;}
 .cell:hover{filter:brightness(1.15);}
 .cell-piece{font-size:clamp(1rem,3.5vw,1.6rem);transition:transform .2s;pointer-events:none;line-height:1;display:flex;align-items:center;justify-content:center;}
 
@@ -259,7 +260,15 @@ function toggleMute() {
   isMuted = !isMuted;
   document.getElementById('mute-btn').textContent = isMuted ? '🔇' : '🔊';
   const bgMusic = document.getElementById('bg-music');
-  if (bgMusic) bgMusic.muted = isMuted;
+  if (bgMusic) {
+    if (isMuted) {
+      bgMusic.muted = true;
+    } else {
+      bgMusic.muted = false;
+      let p = bgMusic.play();
+      if (p !== undefined) p.catch(e => console.log(e));
+    }
+  }
   if (isMuted && window.speechSynthesis) window.speechSynthesis.cancel();
 }
 
@@ -328,7 +337,8 @@ async function speakText(text) {
     if (data.audioContent) {
       const audio = new Audio('data:audio/mp3;base64,' + data.audioContent);
       audio.onended = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; }; 
-      audio.play();
+      let p = audio.play();
+      if (p !== undefined) p.catch(e => console.log(e));
     } else {
       if (bgMusic && !isMuted) bgMusic.volume = 0.15;
     }
@@ -457,7 +467,10 @@ function startJourney(){
   const bgMusic = document.getElementById('bg-music');
   if (bgMusic && !isMuted) {
     bgMusic.volume = 0.15; 
-    bgMusic.play();
+    let p = bgMusic.play();
+    if (p !== undefined) {
+      p.catch(e => console.log("Audio autoplay prevented by browser", e));
+    }
   }
   
   soundFanfare();
