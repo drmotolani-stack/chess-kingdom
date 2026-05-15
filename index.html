@@ -401,7 +401,14 @@ function launchConfetti(){const colors=['#FFD700','#FF6B6B','#4ECDC4','#A855F7',
 function startJourney(){
   const name=$('hero-name-input').value.trim()||'Hero';
   state.heroName=name;
-  document.getElementById('bg-music').play(); // <--- THIS STARTS THE MUSIC
+  
+  // Set background music volume to 15% and play
+  const bgMusic = document.getElementById('bg-music');
+  if (bgMusic) {
+    bgMusic.volume = 0.15; 
+    bgMusic.play();
+  }
+  
   soundFanfare();
   updateHomeUI();renderWorlds();showScreen('screen-home');
 }
