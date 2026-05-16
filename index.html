@@ -194,6 +194,7 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
     <div class="stats-row">
       <div class="stat-badge">⭐ <span id="home-stars">0</span></div>
       <div class="stat-badge">🪙 <span id="home-coins">0</span></div>
+      <div class="streak-badge">🔥 <span id="home-streak">1</span></div>
     </div>
   </div>
   <div class="map-title">🗺️ Chess Kingdom Map</div>
@@ -403,10 +404,9 @@ async function speakText(text) {
   const voicePlayer = document.getElementById('voice-player');
   if (bgMusic && !isMuted) bgMusic.volume = 0.05;
 
-  // --- PASTE YOUR GOOGLE CLOUD API KEY HERE ---
   const apiKey = 'AIzaSyANiUVdIrnK6P2QZrED9w6PPXBa0t6S1PA'; 
   
-  if (apiKey === 'PASTE_YOUR_GOOGLE_CLOUD_KEY_HERE' || apiKey === '') {
+  if (apiKey === '' || !apiKey) {
     playNativeVoice(text);
     return;
   }
@@ -487,12 +487,16 @@ let state={
 let sniper={active:false, score:0, time:30, targetR:0, targetC:0, targetStr:'', timerId:null};
 
 function saveProgress() {
-  const dataToSave = {
-    heroName: state.heroName, stars: state.stars, coins: state.coins, xp: state.xp, streak: state.streak,
-    completedLessons: state.completedLessons, earnedBadges: state.earnedBadges, worldProgress: state.worldProgress,
-    practiceRounds: state.practiceRounds, practiceCorrect: state.practiceCorrect, totalQuizCorrect: state.totalQuizCorrect
-  };
-  localStorage.setItem('chessKingdomState', JSON.stringify(dataToSave));
+  try {
+    const dataToSave = {
+      heroName: state.heroName, stars: state.stars, coins: state.coins, xp: state.xp, streak: state.streak,
+      completedLessons: state.completedLessons, earnedBadges: state.earnedBadges, worldProgress: state.worldProgress,
+      practiceRounds: state.practiceRounds, practiceCorrect: state.practiceCorrect, totalQuizCorrect: state.totalQuizCorrect
+    };
+    localStorage.setItem('chessKingdomState', JSON.stringify(dataToSave));
+  } catch(e) {
+    console.warn("Save blocked by Safari Private Browsing.", e);
+  }
 }
 
 function loadProgress() {
@@ -512,7 +516,7 @@ function loadProgress() {
 
 function resetGame() {
   if(confirm("⚠️ Are you sure you want to erase all progress? This cannot be undone!")) {
-    localStorage.removeItem('chessKingdomState');
+    try { localStorage.removeItem('chessKingdomState'); } catch(e) {}
     location.reload();
   }
 }
@@ -609,9 +613,7 @@ function nextSniperTarget() {
   sniper.targetStr = `${letter}${number}`.toUpperCase();
   $('sniper-target').textContent = `Find ${sniper.targetStr}!`;
   
-  // Executive Decision: For Rapid-Fire games, force zero-latency native voice instead of Cloud API
   playNativeVoice("Find " + sniper.targetStr);
-  
   renderSniperBoard();
 }
 
@@ -639,7 +641,7 @@ function tapSniper(r, c) {
     soundWrong();
     const wrap = $('sniper-board-wrap');
     wrap.style.animation = 'none';
-    void wrap.offsetWidth; // Trigger reflow
+    void wrap.offsetWidth; 
     wrap.style.animation = 'shake .4s ease';
   }
 }
