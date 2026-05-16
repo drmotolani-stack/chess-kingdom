@@ -371,15 +371,16 @@ function changeMusic(trackName) {
 }
 
 // ============ TTS ENGINE ============
+let activeVoiceSource = null;
+
 function stopVoice() {
-  const voicePlayer = document.getElementById('voice-player');
-  const bgMusic = document.getElementById('bg-music');
   window.speechSynthesis.cancel();
-  if(voicePlayer) {
-    voicePlayer.pause();
-    voicePlayer.currentTime = 0;
+  if (activeVoiceSource) {
+    try { activeVoiceSource.stop(); } catch(e) {}
+    activeVoiceSource = null;
   }
-  if(bgMusic && !isMuted) bgMusic.volume = 0.15;
+  const bgMusic = document.getElementById('bg-music');
+  if (bgMusic && !isMuted) bgMusic.volume = 0.15;
 }
 
 // Zero-Latency Fallback Voice
@@ -396,12 +397,21 @@ function playNativeVoice(text) {
   window.speechSynthesis.speak(utter);
 }
 
+// Convert Google's Base64 to Binary ArrayBuffer
+function base64ToArrayBuffer(base64) {
+  const binaryString = window.atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
 async function speakText(text) {
   if (isMuted || !text) return;
   stopVoice();
   
   const bgMusic = document.getElementById('bg-music');
-  const voicePlayer = document.getElementById('voice-player');
   if (bgMusic && !isMuted) bgMusic.volume = 0.05;
 
   const apiKey = 'AIzaSyANiUVdIrnK6P2QZrED9w6PPXBa0t6S1PA'; 
@@ -421,12 +431,32 @@ async function speakText(text) {
   try {
     const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
     const data = await response.json();
+    
     if (data.audioContent) {
-      voicePlayer.src = 'data:audio/mp3;base64,' + data.audioContent;
-      voicePlayer.onended = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; }; 
-      voicePlayer.play().catch(e => { playNativeVoice(text); });
-    } else { throw new Error("No audio content"); }
-  } catch (error) { playNativeVoice(text); }
+      // THE REAL HARDWARE AUDIO INJECTION
+      const ctx = getAudio();
+      if (ctx.state === 'suspended') ctx.resume();
+      
+      const arrayBuffer = base64ToArrayBuffer(data.audioContent);
+      ctx.decodeAudioData(arrayBuffer, (buffer) => {
+        activeVoiceSource = ctx.createBufferSource();
+        activeVoiceSource.buffer = buffer;
+        activeVoiceSource.connect(ctx.destination);
+        activeVoiceSource.onended = () => { 
+          if (bgMusic && !isMuted) bgMusic.volume = 0.15; 
+        };
+        activeVoiceSource.start(0);
+      }, (e) => {
+        console.error("Audio decode error, using fallback", e);
+        playNativeVoice(text);
+      });
+    } else { 
+      throw new Error("No audio content"); 
+    }
+  } catch (error) { 
+    console.error("Google API failed, executing fallback:", error);
+    playNativeVoice(text); 
+  }
 }
 
 window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
