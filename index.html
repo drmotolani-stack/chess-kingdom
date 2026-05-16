@@ -41,7 +41,8 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .btn-start{width:100%;max-width:320px;padding:1.1rem;border-radius:50px;border:none;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1a2e;font-size:1.4rem;font-family:'Fredoka One',cursive;cursor:pointer;z-index:1;box-shadow:0 8px 25px rgba(255,215,0,.4);animation:pulse 2s ease-in-out infinite;transition:transform .1s;}
 .btn-start:hover{transform:scale(1.04);}
 .btn-start:active{transform:scale(.96);}
-#screen-home{background:linear-gradient(180deg,#87CEEB,#98FB98 60%,#228B22);padding:0;overflow-y:auto;}
+
+#screen-home, #screen-puzzles{background:linear-gradient(180deg,#87CEEB,#98FB98 60%,#228B22);padding:0;overflow-y:auto;}
 .home-header{width:100%;background:linear-gradient(135deg,#1E1B2E,#2D1B69);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;box-shadow:0 4px 20px rgba(0,0,0,.3);}
 .hero-info{display:flex;align-items:center;gap:.75rem;}
 .avatar-circle{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));display:flex;align-items:center;justify-content:center;font-size:1.6rem;border:3px solid rgba(255,255,255,.3);flex-shrink:0;}
@@ -51,6 +52,7 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .stat-badge{background:rgba(255,255,255,.15);border-radius:20px;padding:.3rem .7rem;display:flex;align-items:center;gap:.3rem;color:white;font-weight:700;font-size:.9rem;}
 .streak-badge{background:linear-gradient(135deg,#FF6B35,#FF4500);border-radius:20px;padding:.3rem .7rem;display:flex;align-items:center;gap:.3rem;color:white;font-weight:700;font-size:.9rem;}
 .map-title{font-family:'Fredoka One',cursive;font-size:1.8rem;color:#1a1a2e;text-align:center;padding:1.5rem 1rem .5rem;text-shadow:2px 2px 0 rgba(255,255,255,.5);}
+
 .worlds-container{width:100%;padding:.5rem 1rem 2rem;display:flex;flex-direction:column;gap:1rem;max-width:500px;margin:0 auto;}
 .world-card{border-radius:20px;padding:1.2rem 1.5rem;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 6px 20px rgba(0,0,0,.15);position:relative;overflow:hidden;z-index:10;touch-action:manipulation;}
 .world-card.unlocked:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.2);}
@@ -65,6 +67,15 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .world-progress-fill{height:100%;background:rgba(255,255,255,.9);border-radius:10px;transition:width .5s ease;}
 .stars-row{display:flex;gap:4px;margin-top:.4rem;}
 .lock-icon{position:absolute;right:1.2rem;top:50%;transform:translateY(-50%);font-size:1.8rem;}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:500px;background:rgba(26,26,46,.95);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.1);display:flex;z-index:100;}
+.nav-btn{flex:1;padding:.8rem 0;background:none;border:none;color:rgba(255,255,255,.5);font-size:.7rem;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color .2s;font-family:'Nunito',sans-serif;}
+.nav-btn.active{color:var(--gold);}
+.nav-btn-icon{font-size:1.4rem;}
+.spacer{height:70px;}
+
+/* LESSONS */
 #screen-lesson{background:linear-gradient(180deg,#1a1a2e,#16213e);padding:0;overflow-y:auto;}
 .lesson-header{width:100%;padding:1rem 1.5rem;display:flex;align-items:center;gap:1rem;background:rgba(255,255,255,.05);}
 .btn-back{background:rgba(255,255,255,.15);border:none;border-radius:50%;width:44px;height:44px;color:white;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0;}
@@ -80,8 +91,10 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .lesson-speech{background:rgba(255,215,0,.1);border:2px solid rgba(255,215,0,.3);border-radius:16px;padding:1rem;color:var(--gold);font-size:1.1rem;font-weight:700;font-style:italic;margin-top:.5rem;position:relative;}
 .lesson-speech::before{content:'"';font-size:3rem;position:absolute;top:-10px;left:10px;color:var(--gold);opacity:.3;}
 .btn-next{width:100%;max-width:300px;padding:1rem;border-radius:50px;border:none;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1a2e;font-size:1.3rem;font-family:'Fredoka One',cursive;cursor:pointer;box-shadow:0 6px 20px rgba(255,215,0,.35);transition:transform .1s;}
+
+/* BOARD */
 .board-wrap{width:100%;display:flex;flex-direction:column;align-items:center;gap:1rem;}
-.chess-board{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);width:min(336px,88vw);height:min(336px,88vw);border-radius:16px;overflow:hidden;border:4px solid var(--gold);box-shadow:0 0 30px rgba(255,215,0,.3);flex-shrink:0;gap:4px;padding:4px;background:rgba(255,255,255,0.15);}
+.chess-board{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);width:min(336px,88vw);height:min(336px,88vw);border-radius:16px;overflow:hidden;border:4px solid var(--gold);box-shadow:0 0 30px rgba(255,215,0,.3);flex-shrink:0;gap:4px;padding:4px;background:rgba(255,255,255,0.15);position:relative;}
 .cell{display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .1s,filter .2s;position:relative;min-width:0;min-height:0;overflow:hidden;}
 .cell.light{background:#E2F0CB;border-radius:6px;box-shadow:inset 0 -3px 0 rgba(0,0,0,0.1);}
 .cell.dark{background:#88D49E;border-radius:6px;box-shadow:inset 0 -3px 0 rgba(0,0,0,0.1);}
@@ -90,6 +103,9 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .cell.wrong{animation:shake .4s ease;}
 .cell:hover{filter:brightness(1.15);}
 .cell-piece{font-size:clamp(1rem,3.5vw,1.6rem);transition:transform .2s;pointer-events:none;line-height:1;display:flex;align-items:center;justify-content:center;}
+.coord-label{position:absolute;font-size:0.65rem;font-weight:bold;pointer-events:none;}
+
+/* PIECES */
 .piece-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;width:100%;}
 .piece-card{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);border-radius:18px;padding:1rem .5rem;text-align:center;cursor:pointer;transition:transform .2s,border-color .2s,background .2s;}
 .piece-card.selected{border-color:var(--gold);background:rgba(255,215,0,.15);}
@@ -100,6 +116,8 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .piece-card-role{color:rgba(255,255,255,.5);font-size:.7rem;font-weight:600;}
 .game-instruction{background:rgba(255,255,255,.1);border-radius:16px;padding:.8rem 1.2rem;color:white;font-size:1rem;font-weight:700;text-align:center;border:1px solid rgba(255,255,255,.2);}
 .game-instruction .hl{color:var(--gold);}
+
+/* REWARD */
 #screen-reward{background:linear-gradient(135deg,#1a1a2e,#2d1b69);justify-content:center;padding:2rem;gap:1.5rem;}
 .reward-emoji{font-size:5rem;animation:bounce 1s ease-in-out infinite;}
 .reward-title{font-family:'Fredoka One',cursive;color:var(--gold);font-size:2.5rem;text-align:center;text-shadow:0 0 20px rgba(255,215,0,.5);animation:pop .5s ease;}
@@ -112,6 +130,8 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .badge-name{font-family:'Fredoka One',cursive;color:white;font-size:1.1rem;}
 .badge-desc{color:rgba(255,255,255,.7);font-size:.8rem;font-weight:600;}
 .confetti-piece{position:fixed;width:10px;height:10px;border-radius:2px;animation:confettiFall 1.5s ease-out forwards;pointer-events:none;z-index:999;}
+
+/* DASHBOARD */
 #screen-dashboard{background:#F8F9FA;padding:0;overflow-y:auto;}
 .dash-header{background:linear-gradient(135deg,#1E1B2E,#2D1B69);padding:1.5rem;color:white;text-align:center;}
 .dash-title{font-family:'Fredoka One',cursive;font-size:1.8rem;color:var(--gold);}
@@ -127,17 +147,22 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .world-mini-bar{height:6px;background:#eee;border-radius:6px;margin-top:3px;overflow:hidden;}
 .world-mini-fill{height:100%;border-radius:6px;}
 .btn-dash-close{width:100%;padding:1rem;border-radius:50px;border:none;background:linear-gradient(135deg,#1E1B2E,#2D1B69);color:var(--gold);font-family:'Fredoka One',cursive;font-size:1.2rem;cursor:pointer;}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:500px;background:rgba(26,26,46,.95);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.1);display:flex;z-index:100;}
-.nav-btn{flex:1;padding:.8rem 0;background:none;border:none;color:rgba(255,255,255,.5);font-size:.7rem;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color .2s;font-family:'Nunito',sans-serif;}
-.nav-btn.active{color:var(--gold);}
-.nav-btn-icon{font-size:1.4rem;}
-.spacer{height:70px;}
 .practice-banner{width:100%;background:linear-gradient(135deg,#F59E0B,#D97706);border-radius:20px;padding:1.2rem 1.5rem;cursor:pointer;transition:transform .2s;box-shadow:0 6px 20px rgba(245,158,11,.4);animation:glow 2s ease-in-out infinite;position:relative;overflow:hidden;}
 .practice-title{font-family:'Fredoka One',cursive;font-size:1.4rem;color:white;text-shadow:1px 1px 0 rgba(0,0,0,.2);}
 .practice-sub{color:rgba(255,255,255,.85);font-size:.85rem;font-weight:600;margin-top:.2rem;}
 .practice-emoji{font-size:2.2rem;position:absolute;right:1.2rem;top:50%;transform:translateY(-50%);}
 .btn-reset{width:100%;padding:1rem;border-radius:50px;border:2px solid #EF4444;background:rgba(239,68,68,0.1);color:#EF4444;font-family:'Fredoka One',cursive;font-size:1.2rem;cursor:pointer;margin-top:10px;transition:0.2s;}
 .btn-reset:active{background:#EF4444;color:white;}
+
+/* PUZZLES & SNIPER */
+#screen-sniper{background:linear-gradient(180deg,#1a1a2e,#16213e);padding:0;overflow-y:auto;}
+.sniper-header{width:100%;padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.05);}
+.sniper-target-box{background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:16px;padding:.8rem 2rem;text-align:center;box-shadow:0 4px 15px rgba(255,215,0,.4);animation:pulse 1s infinite;}
+.sniper-target-text{font-family:'Fredoka One',cursive;color:#1a1a2e;font-size:2rem;}
+.sniper-timer-wrap{width:100%;padding:1rem 1.5rem;}
+.sniper-timer-bar{height:12px;background:rgba(255,255,255,.15);border-radius:10px;overflow:hidden;position:relative;}
+.sniper-timer-fill{height:100%;background:#EF4444;border-radius:10px;transition:width 1s linear;}
+.sniper-stats{display:flex;justify-content:space-between;color:white;font-weight:700;margin-bottom:0.5rem;font-size:1.1rem;}
 </style>
 </head>
 <body>
@@ -169,7 +194,6 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
     <div class="stats-row">
       <div class="stat-badge">⭐ <span id="home-stars">0</span></div>
       <div class="stat-badge">🪙 <span id="home-coins">0</span></div>
-      <div class="streak-badge">🔥 <span id="home-streak">1</span></div>
     </div>
   </div>
   <div class="map-title">🗺️ Chess Kingdom Map</div>
@@ -177,8 +201,62 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
   <div class="spacer"></div>
   <div class="bottom-nav">
     <button class="nav-btn active" onclick="showHome()"><span class="nav-btn-icon">🏰</span>Map</button>
+    <button class="nav-btn" onclick="showPuzzles()"><span class="nav-btn-icon">🧩</span>Puzzles</button>
     <button class="nav-btn" onclick="showDashboard()"><span class="nav-btn-icon">📊</span>Progress</button>
     <button class="nav-btn" onclick="showTrophies()"><span class="nav-btn-icon">🏆</span>Trophies</button>
+  </div>
+</div>
+
+<div id="screen-puzzles" class="screen">
+  <div class="home-header">
+    <div class="hero-info">
+      <div class="avatar-circle">🧩</div>
+      <div>
+        <div class="hero-name">Puzzle Academy</div>
+        <div class="hero-title">Train your brain!</div>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-badge">🪙 <span id="puzzles-coins">0</span></div>
+    </div>
+  </div>
+  <div class="map-title">Train Your Vision</div>
+  <div class="worlds-container">
+    <div class="world-card unlocked" style="background:linear-gradient(135deg,#EF4444,#B91C1C)" onclick="soundClick();startSniper()">
+      <div class="world-num">COORDINATES</div>
+      <div class="world-name">Square Sniper 🎯</div>
+      <div class="world-desc">Find the square before time runs out!</div>
+      <span class="world-emoji">⏱️</span>
+    </div>
+    <div class="world-card locked" style="background:linear-gradient(135deg,#3B82F6,#1D4ED8)">
+      <div class="world-num">TACTICS</div>
+      <div class="world-name">Puzzle Rush</div>
+      <div class="world-desc">Coming soon to the Academy!</div>
+      <span class="world-emoji">⚡</span>
+      <span class="lock-icon">🔒</span>
+    </div>
+  </div>
+  <div class="spacer"></div>
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="showHome()"><span class="nav-btn-icon">🏰</span>Map</button>
+    <button class="nav-btn active" onclick="showPuzzles()"><span class="nav-btn-icon">🧩</span>Puzzles</button>
+    <button class="nav-btn" onclick="showDashboard()"><span class="nav-btn-icon">📊</span>Progress</button>
+    <button class="nav-btn" onclick="showTrophies()"><span class="nav-btn-icon">🏆</span>Trophies</button>
+  </div>
+</div>
+
+<div id="screen-sniper" class="screen">
+  <div class="sniper-header">
+    <button class="btn-back" onclick="endSniperEarly()">←</button>
+    <div class="stat-badge">⭐ Score: <span id="sniper-score">0</span></div>
+  </div>
+  <div class="sniper-timer-wrap">
+    <div class="sniper-stats"><span>Time Left</span><span id="sniper-time">30s</span></div>
+    <div class="sniper-timer-bar"><div class="sniper-timer-fill" id="sniper-bar-fill"></div></div>
+  </div>
+  <div class="lesson-content" style="padding-top:0">
+    <div class="sniper-target-box"><div class="sniper-target-text" id="sniper-target">Ready?</div></div>
+    <div class="board-wrap" id="sniper-board-wrap" style="margin-top:1rem"></div>
   </div>
 </div>
 
@@ -199,7 +277,7 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
   <div class="reward-emoji" id="reward-emoji">🏆</div>
   <div class="reward-title" id="reward-title">Amazing!</div>
   <div class="reward-subtitle" id="reward-subtitle">You did it!</div>
-  <div class="reward-stars"><span class="reward-star">⭐</span><span class="reward-star">⭐</span><span class="reward-star">⭐</span></div>
+  <div class="reward-stars" id="reward-stars-container"><span class="reward-star">⭐</span><span class="reward-star">⭐</span><span class="reward-star">⭐</span></div>
   <div class="xp-gained" id="xp-gained">+50 XP</div>
   <div class="badge-earned" id="badge-earned" style="display:none">
     <span class="badge-icon">🎖️</span>
@@ -238,6 +316,13 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
     <button class="btn-dash-close" onclick="showHome()">⬅️ Back to Map</button>
     <button class="btn-reset" onclick="resetGame()">⚠️ Reset All Progress</button>
   </div>
+  <div class="spacer"></div>
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="showHome()"><span class="nav-btn-icon">🏰</span>Map</button>
+    <button class="nav-btn" onclick="showPuzzles()"><span class="nav-btn-icon">🧩</span>Puzzles</button>
+    <button class="nav-btn active" onclick="showDashboard()"><span class="nav-btn-icon">📊</span>Progress</button>
+    <button class="nav-btn" onclick="showTrophies()"><span class="nav-btn-icon">🏆</span>Trophies</button>
+  </div>
 </div>
 
 <script>
@@ -274,8 +359,6 @@ function changeMusic(trackName) {
   const bgMusic = document.getElementById('bg-music');
   if (!bgMusic) return;
   const currentSrc = bgMusic.getAttribute('src');
-  
-  // Cache buster trick for audio files
   const trackWithCacheBuster = trackName + '?v=fresh';
   
   if (!currentSrc || !currentSrc.includes(trackName)) {
@@ -286,11 +369,11 @@ function changeMusic(trackName) {
   }
 }
 
-// ============ IRONCLAD TTS ENGINE ============
+// ============ TTS ENGINE ============
 function stopVoice() {
   const voicePlayer = document.getElementById('voice-player');
   const bgMusic = document.getElementById('bg-music');
-  window.speechSynthesis.cancel(); // Stop native voice if playing
+  window.speechSynthesis.cancel();
   if(voicePlayer) {
     voicePlayer.pause();
     voicePlayer.currentTime = 0;
@@ -298,19 +381,15 @@ function stopVoice() {
   if(bgMusic && !isMuted) bgMusic.volume = 0.15;
 }
 
-// Fallback to iPad/Browser Native Voice
+// Zero-Latency Fallback Voice
 function playNativeVoice(text) {
   const bgMusic = document.getElementById('bg-music');
   const utter = new SpeechSynthesisUtterance(text);
-  
-  // Try to find a premium native voice
   const allVoices = window.speechSynthesis.getVoices();
   const bestVoice = allVoices.find(v => v.name.includes('Samantha') || v.name.includes('Premium') || v.name.includes('Google UK English Female') || v.lang === 'en-GB') || allVoices[0];
-  
   if (bestVoice) utter.voice = bestVoice;
   utter.rate = 0.9;
   utter.pitch = 1.0;
-  
   utter.onend = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; };
   utter.onerror = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; };
   window.speechSynthesis.speak(utter);
@@ -327,7 +406,6 @@ async function speakText(text) {
   // --- PASTE YOUR GOOGLE CLOUD API KEY HERE ---
   const apiKey = 'AIzaSyANiUVdIrnK6P2QZrED9w6PPXBa0t6S1PA'; 
   
-  // If key is empty/default, go straight to fallback
   if (apiKey === 'PASTE_YOUR_GOOGLE_CLOUD_KEY_HERE' || apiKey === '') {
     playNativeVoice(text);
     return;
@@ -341,33 +419,19 @@ async function speakText(text) {
   };
 
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
     const data = await response.json();
-    
     if (data.audioContent) {
       voicePlayer.src = 'data:audio/mp3;base64,' + data.audioContent;
       voicePlayer.onended = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; }; 
-      voicePlayer.play().catch(e => {
-        console.log("Safari blocked API audio, falling back to native", e);
-        playNativeVoice(text);
-      });
-    } else {
-      throw new Error("No audio content in Google API response");
-    }
-  } catch (error) {
-    console.log("Google API failed, executing Ironclad Fallback:", error);
-    playNativeVoice(text);
-  }
+      voicePlayer.play().catch(e => { playNativeVoice(text); });
+    } else { throw new Error("No audio content"); }
+  } catch (error) { playNativeVoice(text); }
 }
 
-// Ensure voices are loaded for the fallback
 window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
 
-// ============ DATA ============
+// ============ DATA & LESSONS ============
 const WORLDS=[
   {id:1,name:"Chess Kingdom",emoji:"🏰",color:"linear-gradient(135deg,#8B5CF6,#6D28D9)",desc:"Discover the magical board!",lessons:3,unlocked:true},
   {id:2,name:"Castle Towers",emoji:"🏯",color:"linear-gradient(135deg,#3B82F6,#1D4ED8)",desc:"Learn how the Rook moves!",lessons:3,unlocked:false},
@@ -379,7 +443,6 @@ const WORLDS=[
   {id:8,name:"Battle Academy",emoji:"🛡️",color:"linear-gradient(135deg,#0EA5E9,#0369A1)",desc:"Learn your first battle moves!",lessons:3,unlocked:false},
   {id:9,name:"Champion Arena",emoji:"🏆",color:"linear-gradient(135deg,#D97706,#92400E)",desc:"Play real games! Become champion!",lessons:3,unlocked:false},
 ];
-
 const PIECES=[
   {emoji:'♙',name:'Pawn',role:'Brave Soldier',color:'#6B7280',clues:["I march forward one step at a time — never backward!","I am the smallest soldier, but I have a secret power: I can become a Queen!"],desc:"I am small but brave! I march forward to protect everyone!"},
   {emoji:'♖',name:'Rook',role:'Castle Tower',color:'#3B82F6',clues:["I am shaped like a castle tower and I slide in straight lines only!","I never turn corners. I only go straight — like a train on a track!"],desc:"I am the mighty castle tower! I slide straight — left, right, up, down."},
@@ -388,70 +451,20 @@ const PIECES=[
   {emoji:'♔',name:'King',role:'Precious Leader',color:'#F59E0B',clues:["I am the most important piece — if I fall, the game is over!","I can only move ONE square at a time, but the whole army protects me!"],desc:"I am the most precious! I can only move one square at a time."},
   {emoji:'♘',name:'Knight',role:'Jumping Horse',color:'#8B5CF6',clues:["I move in an L-shape — two squares one way, then one square sideways!","I am the ONLY piece that can jump over other pieces!"],desc:"I jump in an L-shape — two squares then one! I leap over others!"},
 ];
-
 const BADGES=[
-  {id:'board_explorer',name:'Board Explorer',desc:'Explored the magical board!',emoji:'🗺️'},
-  {id:'piece_master',name:'Piece Master',desc:'Met all chess heroes!',emoji:'⚔️'},
-  {id:'world1_champ',name:'World 1 Champion',desc:'Conquered Chess Kingdom!',emoji:'🏰'},
-  {id:'practice_hero',name:'Practice Hero',desc:'Completed 5 practice rounds!',emoji:'🔁'},
-  {id:'quiz_wizard',name:'Quiz Wizard',desc:'Got 10 questions right!',emoji:'🧙'},
-  {id:'rook_master',name:'Rook Master',desc:'Conquered the Castle Towers!',emoji:'🏯'},
-  {id:'bishop_wizard',name:'Bishop Wizard',desc:'Mastered the diagonal magic!',emoji:'🧙'},
-  {id:'queen_commander',name:'Queen Commander',desc:"Unleashed the Queen's full power!",emoji:'👸'},
-  {id:'knight_champion',name:'Knight Champion',desc:'Mastered the L-jump!',emoji:'🐴'},
-  {id:'pawn_hero',name:'Pawn Hero',desc:'Led the brave pawn army!',emoji:'⚔️'},
-  {id:'king_guardian',name:'King Guardian',desc:'Learned to protect the King!',emoji:'👑'},
-  {id:'battle_graduate',name:'Battle Graduate',desc:'Graduated from Battle Academy!',emoji:'🛡️'},
-  {id:'grand_champion',name:'Grand Champion',desc:'Conquered all 9 worlds!',emoji:'🏆'}
+  {id:'board_explorer',name:'Board Explorer',desc:'Explored the magical board!',emoji:'🗺️'},{id:'piece_master',name:'Piece Master',desc:'Met all chess heroes!',emoji:'⚔️'},{id:'world1_champ',name:'World 1 Champion',desc:'Conquered Chess Kingdom!',emoji:'🏰'},{id:'practice_hero',name:'Practice Hero',desc:'Completed 5 practice rounds!',emoji:'🔁'},{id:'quiz_wizard',name:'Quiz Wizard',desc:'Got 10 questions right!',emoji:'🧙'},{id:'rook_master',name:'Rook Master',desc:'Conquered the Castle Towers!',emoji:'🏯'},{id:'bishop_wizard',name:'Bishop Wizard',desc:'Mastered the diagonal magic!',emoji:'🧙'},{id:'queen_commander',name:'Queen Commander',desc:"Unleashed the Queen's full power!",emoji:'👸'},{id:'knight_champion',name:'Knight Champion',desc:'Mastered the L-jump!',emoji:'🐴'},{id:'pawn_hero',name:'Pawn Hero',desc:'Led the brave pawn army!',emoji:'⚔️'},{id:'king_guardian',name:'King Guardian',desc:'Learned to protect the King!',emoji:'👑'},{id:'battle_graduate',name:'Battle Graduate',desc:'Graduated from Battle Academy!',emoji:'🛡️'},{id:'grand_champion',name:'Grand Champion',desc:'Conquered all 9 worlds!',emoji:'🏆'}
 ];
 const TITLES=['Pawn Explorer','Knight Jumper','Castle Defender','Bishop Seeker','Queen Commander','Chess Hero'];
 
-// ============ LESSON DATA ============
-const WORLD1_LESSONS=[
-  {id:'w1l1',title:'The Magical Board',steps:[{type:'story',emoji:'🏰',heading:'Welcome to Chess Kingdom!',text:'A long time ago, in a magical kingdom far away... two armies faced each other on a great battle board!',speech:'Every square on this board is a magical land... where our heroes live!'},{type:'board-explore',heading:'Touch the Magic Board!',instruction:'Tap any square on the board to light it up!',goal:5},{type:'quiz',heading:'Quick Question! 🧠',question:'How many squares are on a chess board?',options:['32','64','100','48'],correct:1,praise:'Yes! 64 squares — 8 rows of 8! You are SO smart!'}]},
-  {id:'w1l2',title:'Meet the Chess Heroes!',steps:[{type:'piece-parade',heading:'The Chess Heroes!',instruction:'Tap each hero to meet them!'},{type:'piece-match',heading:'Who Am I? 🎭',instruction:'Read the clue and find the right hero!'}]},
-  {id:'w1l3',title:'Set Up the Kingdom!',steps:[{type:'board-place',heading:'Place the Pawns!',instruction:'Tap the glowing squares to place your brave soldiers!'},{type:'story',emoji:'🌟',heading:'World 1 Complete!',text:'You have explored the Chess Kingdom! You know the board, you know the heroes, and you placed the pawn army!'}]}
-];
-const WORLD2_LESSONS=[
-  {id:'w2l1',title:'Meet the Rook!',steps:[{type:'story',emoji:'🏯',heading:'The Mighty Castle Tower!',text:'Deep in the Chess Kingdom lives a MIGHTY castle tower called the ROOK! It slides in straight lines!',speech:'I am the Rook! I slide in straight lines — left, right, up, and down!'},{type:'rook-move',heading:'Drive the Rook! 🏯',instruction:'Tap a glowing square to move the Rook along its straight path!',goal:5}]},
-  {id:'w2l2',title:'Rook Race!',steps:[{type:'rook-capture',heading:'Capture the Treasure! 🎯',instruction:'Move the Rook to capture all the golden treasure pieces!'}]},
-  {id:'w2l3',title:'Rook Champion!',steps:[{type:'rook-move',heading:'Rook Master Challenge! 🏆',instruction:'Show your rook skills — collect 8 squares this time!',goal:8}]}
-];
-const WORLD3_LESSONS=[
-  {id:'w3l1',title:'Meet the Bishop!',steps:[{type:'story',emoji:'🧙',heading:'The Magical Wizard!',text:'In the deep forests lives a WIZARD called the BISHOP! This wizard only travels on magical diagonal paths!',speech:'I am the Bishop! I slide diagonally across the board!'},{type:'bishop-move',heading:'Guide the Wizard! 🧙',instruction:'Tap a glowing square to send the wizard on a diagonal path!',goal:5}]},
-  {id:'w3l2',title:'Colour Magic!',steps:[{type:'quiz',heading:'Colour Quiz! 🎨',question:'If the Bishop starts on a dark square, which squares can it reach?',options:['Only light squares','Both colours','Only dark squares','No squares'],correct:2,praise:'Dark squares only! It stays on its colour forever!'}]},
-  {id:'w3l3',title:'Wizard Champion!',steps:[{type:'bishop-move',heading:'Bishop Master! 🔮',instruction:'Master the diagonals — collect 8 squares!',goal:8}]}
-];
-const WORLD4_LESSONS=[
-  {id:'w4l1',title:'Meet the Queen!',steps:[{type:'story',emoji:'👸',heading:'The Most Powerful Piece!',text:'The QUEEN can move in ANY direction she wants! Like a Rook AND a Bishop combined!',speech:'I am the Queen! No one can stop me!'},{type:'queen-move',heading:'Command the Queen! 👸',instruction:'The Queen can go anywhere — tap a glowing square!',goal:6}]},
-  {id:'w4l2',title:"Queen's Hunt!",steps:[{type:'queen-move',heading:"Queen's Treasure Hunt! 🎯",instruction:'Guide the Queen on her powerful patrol!',goal:8}]},
-  {id:'w4l3',title:'Queen Champion!',steps:[{type:'queen-move',heading:'Queen Master! 👸',instruction:'Show your Queen mastery — explore 10 squares!',goal:10}]}
-];
-const WORLD5_LESSONS=[
-  {id:'w5l1',title:'Meet the Knight!',steps:[{type:'story',emoji:'🐴',heading:'The Jumping Horse!',text:'The KNIGHT jumps in an L-shape! It is the ONLY piece that can jump OVER other pieces!',speech:'I jump in an L — two squares one way, then one sideways!'},{type:'knight-move',heading:'Jump with the Knight! 🐴',instruction:"Tap a glowing square — only the Knight's magic L-squares light up!",goal:4}]},
-  {id:'w5l2',title:'Knight Jump Quest!',steps:[{type:'knight-move',heading:'Knight Jump Quest! ⭐',instruction:'Practice the L-jump — reach 6 different squares!',goal:6}]},
-  {id:'w5l3',title:'Knight Champion!',steps:[{type:'knight-move',heading:'Knight Master! 🏇',instruction:'Master the L-jump — reach 8 squares!',goal:8}]}
-];
-const WORLD6_LESSONS=[
-  {id:'w6l1',title:'Meet the Pawns!',steps:[{type:'story',emoji:'⚔️',heading:'The Brave Soldiers!',text:'Pawns march FORWARD — never backward! On their first move, they can go 1 OR 2 squares.',speech:'Forward march!'},{type:'pawn-march',heading:'March the Pawns! ⚔️',instruction:'Tap a glowing square to march the brave soldier forward!',goal:5}]},
-  {id:'w6l2',title:'Pawn Power!',steps:[{type:'pawn-capture',heading:'Capture the Enemy! 🗡️',instruction:'Move the pawn to capture the red enemy pieces diagonally!'}]},
-  {id:'w6l3',title:'Pawn Promotion!',steps:[{type:'pawn-promote',heading:'Escort to the Crown! 👑',instruction:'Guide the brave pawn all the way to the other side to become a Queen!'}]}
-];
-const WORLD7_LESSONS=[
-  {id:'w7l1',title:'The King!',steps:[{type:'story',emoji:'👑',heading:'The Most Important Piece!',text:'The King moves ONE square in ANY direction. If the King is caught, the GAME IS OVER!',speech:'Protect me above all others!'},{type:'king-move',heading:'Move the King! 👑',instruction:'Tap any glowing square to move the King one step!',goal:6}]},
-  {id:'w7l2',title:'What is CHECK?',steps:[{type:'safe-square',heading:'Find the Safe Square! 🛡️',instruction:'The King is in danger! Tap the safe square to escape CHECK!'}]},
-  {id:'w7l3',title:'Checkmate!',steps:[{type:'quiz',heading:'Checkmate Quiz! 🏁',question:'What is CHECKMATE?',options:['King moves two squares','King in check with no escape','Capturing the Queen','Starting the game'],correct:1,praise:'Check with NO escape — game over!'}]}
-];
-const WORLD8_LESSONS=[
-  {id:'w8l1',title:'Control the Centre!',steps:[{type:'centre-control',heading:'Claim the Centre! 🎯',instruction:'Tap the 4 glowing centre squares to claim them for your army!'}]},
-  {id:'w8l2',title:'Opening Moves!',steps:[{type:'opening-sequence',heading:'Play the Opening! ♟️',instruction:'Follow the glowing squares to play the perfect opening!'}]},
-  {id:'w8l3',title:'Capture Treasure!',steps:[{type:'treasure-capture',heading:'Spot the Free Piece! 💎',instruction:'Find and capture the unprotected enemy piece on the board!'}]}
-];
-const WORLD9_LESSONS=[
-  {id:'w9l1',title:'Your First Game!',steps:[{type:'mini-game-quiz',heading:'Champion Quiz! 🏆',questions:[{q:'Which piece moves in an L-shape?',opts:['Rook','Knight','Bishop','Queen'],correct:1,praise:'Knight!'},{q:'Which piece is most important?',opts:['Queen','Bishop','King','Rook'],correct:2,praise:'The King!'}]}]},
-  {id:'w9l2',title:'Chess Champion!',steps:[{type:'champion-board',heading:"The Champion's Challenge! 🏆",instruction:'Make 3 strong chess moves to prove you are a Champion!',goal:3}]},
-  {id:'w9l3',title:'Grand Champion!',steps:[{type:'story',emoji:'🌈',heading:'CHESS KINGDOM COMPLETE!',text:'YOU DID IT! You have conquered all 9 worlds of the Chess Kingdom!',speech:'All hail the Chess Champion!'}]}
-];
+const WORLD1_LESSONS=[{id:'w1l1',title:'The Magical Board',steps:[{type:'story',emoji:'🏰',heading:'Welcome to Chess Kingdom!',text:'A long time ago, in a magical kingdom far away... two armies faced each other on a great battle board!',speech:'Every square on this board is a magical land... where our heroes live!'},{type:'board-explore',heading:'Touch the Magic Board!',instruction:'Tap any square on the board to light it up!',goal:5},{type:'quiz',heading:'Quick Question! 🧠',question:'How many squares are on a chess board?',options:['32','64','100','48'],correct:1,praise:'Yes! 64 squares — 8 rows of 8! You are SO smart!'}]},{id:'w1l2',title:'Meet the Chess Heroes!',steps:[{type:'piece-parade',heading:'The Chess Heroes!',instruction:'Tap each hero to meet them!'},{type:'piece-match',heading:'Who Am I? 🎭',instruction:'Read the clue and find the right hero!'}]},{id:'w1l3',title:'Set Up the Kingdom!',steps:[{type:'board-place',heading:'Place the Pawns!',instruction:'Tap the glowing squares to place your brave soldiers!'},{type:'story',emoji:'🌟',heading:'World 1 Complete!',text:'You have explored the Chess Kingdom! You know the board, you know the heroes, and you placed the pawn army!'}]}];
+const WORLD2_LESSONS=[{id:'w2l1',title:'Meet the Rook!',steps:[{type:'story',emoji:'🏯',heading:'The Mighty Castle Tower!',text:'Deep in the Chess Kingdom lives a MIGHTY castle tower called the ROOK! It slides in straight lines!',speech:'I am the Rook! I slide in straight lines — left, right, up, and down!'},{type:'rook-move',heading:'Drive the Rook! 🏯',instruction:'Tap a glowing square to move the Rook along its straight path!',goal:5}]},{id:'w2l2',title:'Rook Race!',steps:[{type:'rook-capture',heading:'Capture the Treasure! 🎯',instruction:'Move the Rook to capture all the golden treasure pieces!'}]},{id:'w2l3',title:'Rook Champion!',steps:[{type:'rook-move',heading:'Rook Master Challenge! 🏆',instruction:'Show your rook skills — collect 8 squares this time!',goal:8}]}];
+const WORLD3_LESSONS=[{id:'w3l1',title:'Meet the Bishop!',steps:[{type:'story',emoji:'🧙',heading:'The Magical Wizard!',text:'In the deep forests lives a WIZARD called the BISHOP! This wizard only travels on magical diagonal paths!',speech:'I am the Bishop! I slide diagonally across the board!'},{type:'bishop-move',heading:'Guide the Wizard! 🧙',instruction:'Tap a glowing square to send the wizard on a diagonal path!',goal:5}]},{id:'w3l2',title:'Colour Magic!',steps:[{type:'quiz',heading:'Colour Quiz! 🎨',question:'If the Bishop starts on a dark square, which squares can it reach?',options:['Only light squares','Both colours','Only dark squares','No squares'],correct:2,praise:'Dark squares only! It stays on its colour forever!'}]},{id:'w3l3',title:'Wizard Champion!',steps:[{type:'bishop-move',heading:'Bishop Master! 🔮',instruction:'Master the diagonals — collect 8 squares!',goal:8}]}];
+const WORLD4_LESSONS=[{id:'w4l1',title:'Meet the Queen!',steps:[{type:'story',emoji:'👸',heading:'The Most Powerful Piece!',text:'The QUEEN can move in ANY direction she wants! Like a Rook AND a Bishop combined!',speech:'I am the Queen! No one can stop me!'},{type:'queen-move',heading:'Command the Queen! 👸',instruction:'The Queen can go anywhere — tap a glowing square!',goal:6}]},{id:'w4l2',title:"Queen's Hunt!",steps:[{type:'queen-move',heading:"Queen's Treasure Hunt! 🎯",instruction:'Guide the Queen on her powerful patrol!',goal:8}]},{id:'w4l3',title:'Queen Champion!',steps:[{type:'queen-move',heading:'Queen Master! 👸',instruction:'Show your Queen mastery — explore 10 squares!',goal:10}]}];
+const WORLD5_LESSONS=[{id:'w5l1',title:'Meet the Knight!',steps:[{type:'story',emoji:'🐴',heading:'The Jumping Horse!',text:'The KNIGHT jumps in an L-shape! It is the ONLY piece that can jump OVER other pieces!',speech:'I jump in an L — two squares one way, then one sideways!'},{type:'knight-move',heading:'Jump with the Knight! 🐴',instruction:"Tap a glowing square — only the Knight's magic L-squares light up!",goal:4}]},{id:'w5l2',title:'Knight Jump Quest!',steps:[{type:'knight-move',heading:'Knight Jump Quest! ⭐',instruction:'Practice the L-jump — reach 6 different squares!',goal:6}]},{id:'w5l3',title:'Knight Champion!',steps:[{type:'knight-move',heading:'Knight Master! 🏇',instruction:'Master the L-jump — reach 8 squares!',goal:8}]}];
+const WORLD6_LESSONS=[{id:'w6l1',title:'Meet the Pawns!',steps:[{type:'story',emoji:'⚔️',heading:'The Brave Soldiers!',text:'Pawns march FORWARD — never backward! On their first move, they can go 1 OR 2 squares.',speech:'Forward march!'},{type:'pawn-march',heading:'March the Pawns! ⚔️',instruction:'Tap a glowing square to march the brave soldier forward!',goal:5}]},{id:'w6l2',title:'Pawn Power!',steps:[{type:'pawn-capture',heading:'Capture the Enemy! 🗡️',instruction:'Move the pawn to capture the red enemy pieces diagonally!'}]},{id:'w6l3',title:'Pawn Promotion!',steps:[{type:'pawn-promote',heading:'Escort to the Crown! 👑',instruction:'Guide the brave pawn all the way to the other side to become a Queen!'}]}];
+const WORLD7_LESSONS=[{id:'w7l1',title:'The King!',steps:[{type:'story',emoji:'👑',heading:'The Most Important Piece!',text:'The King moves ONE square in ANY direction. If the King is caught, the GAME IS OVER!',speech:'Protect me above all others!'},{type:'king-move',heading:'Move the King! 👑',instruction:'Tap any glowing square to move the King one step!',goal:6}]},{id:'w7l2',title:'What is CHECK?',steps:[{type:'safe-square',heading:'Find the Safe Square! 🛡️',instruction:'The King is in danger! Tap the safe square to escape CHECK!'}]},{id:'w7l3',title:'Checkmate!',steps:[{type:'quiz',heading:'Checkmate Quiz! 🏁',question:'What is CHECKMATE?',options:['King moves two squares','King in check with no escape','Capturing the Queen','Starting the game'],correct:1,praise:'Check with NO escape — game over!'}]}];
+const WORLD8_LESSONS=[{id:'w8l1',title:'Control the Centre!',steps:[{type:'centre-control',heading:'Claim the Centre! 🎯',instruction:'Tap the 4 glowing centre squares to claim them for your army!'}]},{id:'w8l2',title:'Opening Moves!',steps:[{type:'opening-sequence',heading:'Play the Opening! ♟️',instruction:'Follow the glowing squares to play the perfect opening!'}]},{id:'w8l3',title:'Capture Treasure!',steps:[{type:'treasure-capture',heading:'Spot the Free Piece! 💎',instruction:'Find and capture the unprotected enemy piece on the board!'}]}];
+const WORLD9_LESSONS=[{id:'w9l1',title:'Your First Game!',steps:[{type:'mini-game-quiz',heading:'Champion Quiz! 🏆',questions:[{q:'Which piece moves in an L-shape?',opts:['Rook','Knight','Bishop','Queen'],correct:1,praise:'Knight!'},{q:'Which piece is most important?',opts:['Queen','Bishop','King','Rook'],correct:2,praise:'The King!'}]}]},{id:'w9l2',title:'Chess Champion!',steps:[{type:'champion-board',heading:"The Champion's Challenge! 🏆",instruction:'Make 3 strong chess moves to prove you are a Champion!',goal:3}]},{id:'w9l3',title:'Grand Champion!',steps:[{type:'story',emoji:'🌈',heading:'CHESS KINGDOM COMPLETE!',text:'YOU DID IT! You have conquered all 9 worlds of the Chess Kingdom!',speech:'All hail the Chess Champion!'}]}];
 
 function getPracticeRound(){
   const pool=[{type:'piece-match',heading:'Who Am I? 🎭',instruction:'Read the clue and find the right hero!'},{type:'quiz',heading:'Board Quiz! 🏁',question:'How many squares does a chess board have?',options:['64','32','48','128'],correct:0,praise:'64 squares!'},{type:'rook-move',heading:'Rook Practice! 🏯',instruction:'Move the Rook and collect squares!',goal:5},{type:'knight-move',heading:'Knight Practice! 🐴',instruction:'Jump with the Knight in L-shapes!',goal:4}];
@@ -467,22 +480,17 @@ let state={
   currentWorld:null,currentLesson:null,currentStep:0,
   piecesDiscovered:[],lightedSquares:0,placedPawns:0,
   practiceMode:false,moveGame:null,rookCapture:null,pawnGame:null,pawnCapture:null,
-  pawnPromote:null,kingGame:null,safeGame:null,centreGame:null,openingGame:null,treasureCapture:null,championGame:null,mqQuiz:null
+  pawnPromote:null,kingGame:null,safeGame:null,centreGame:null,openingGame:null,treasureCapture:null,championGame:null,mqQuiz:null,
+  routingBackTo: null
 };
+
+let sniper={active:false, score:0, time:30, targetR:0, targetC:0, targetStr:'', timerId:null};
 
 function saveProgress() {
   const dataToSave = {
-    heroName: state.heroName,
-    stars: state.stars,
-    coins: state.coins,
-    xp: state.xp,
-    streak: state.streak,
-    completedLessons: state.completedLessons,
-    earnedBadges: state.earnedBadges,
-    worldProgress: state.worldProgress,
-    practiceRounds: state.practiceRounds,
-    practiceCorrect: state.practiceCorrect,
-    totalQuizCorrect: state.totalQuizCorrect
+    heroName: state.heroName, stars: state.stars, coins: state.coins, xp: state.xp, streak: state.streak,
+    completedLessons: state.completedLessons, earnedBadges: state.earnedBadges, worldProgress: state.worldProgress,
+    practiceRounds: state.practiceRounds, practiceCorrect: state.practiceCorrect, totalQuizCorrect: state.totalQuizCorrect
   };
   localStorage.setItem('chessKingdomState', JSON.stringify(dataToSave));
 }
@@ -499,7 +507,7 @@ function loadProgress() {
         document.getElementById('btn-begin-journey').textContent = '⚔️ Continue Adventure!';
       }
     }
-  } catch(e) { console.error("Could not load progress", e); }
+  } catch(e) {}
 }
 
 function resetGame() {
@@ -524,18 +532,12 @@ function startJourney(){
   saveProgress();
   
   if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume();
-  
   const voicePlayer = document.getElementById('voice-player');
-  if (voicePlayer) {
-    voicePlayer.src = 'data:audio/mp3;base64,//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq';
-    voicePlayer.volume = 0.01;
-    voicePlayer.play().catch(e => {});
-  }
+  if (voicePlayer) { voicePlayer.src = 'data:audio/mp3;base64,//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq'; voicePlayer.volume = 0.01; voicePlayer.play().catch(e => {}); }
 
   const bgMusic=document.getElementById('bg-music');
   if(bgMusic) bgMusic.volume=0.15;
   changeMusic('welcome.mp3');
-
   soundFanfare();
   updateHomeUI();renderWorlds();showScreen('screen-home');
 }
@@ -544,6 +546,13 @@ function showHome(){
   stopVoice();
   changeMusic('welcome.mp3');
   updateHomeUI();renderWorlds();showScreen('screen-home');
+}
+
+function showPuzzles() {
+  stopVoice();
+  changeMusic('welcome.mp3');
+  $('puzzles-coins').textContent=state.coins;
+  showScreen('screen-puzzles');
 }
 
 function updateHomeUI(){
@@ -577,13 +586,104 @@ function renderWorlds(){
   });
 }
 
+// ============ PUZZLES: SQUARE SNIPER ============
+function startSniper() {
+  stopVoice();
+  changeMusic('world9.mp3'); 
+  sniper.score = 0;
+  sniper.time = 30;
+  sniper.active = true;
+  $('sniper-score').textContent = '0';
+  $('sniper-time').textContent = '30s';
+  $('sniper-bar-fill').style.width = '100%';
+  showScreen('screen-sniper');
+  nextSniperTarget();
+  sniper.timerId = setInterval(sniperTick, 1000);
+}
+
+function nextSniperTarget() {
+  sniper.targetR = Math.floor(Math.random()*8);
+  sniper.targetC = Math.floor(Math.random()*8);
+  const letter = String.fromCharCode(97 + sniper.targetC);
+  const number = 8 - sniper.targetR;
+  sniper.targetStr = `${letter}${number}`.toUpperCase();
+  $('sniper-target').textContent = `Find ${sniper.targetStr}!`;
+  
+  // Executive Decision: For Rapid-Fire games, force zero-latency native voice instead of Cloud API
+  playNativeVoice("Find " + sniper.targetStr);
+  
+  renderSniperBoard();
+}
+
+function renderSniperBoard() {
+  let html='<div class="chess-board" style="position:relative;">';
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const light=(r+c)%2===0;
+    let labels = '';
+    if(c===0) labels += `<span class="coord-label" style="top:2px;left:4px;color:${light?'#88D49E':'#E2F0CB'}">${8-r}</span>`;
+    if(r===7) labels += `<span class="coord-label" style="bottom:2px;right:4px;color:${light?'#88D49E':'#E2F0CB'}">${String.fromCharCode(97+c)}</span>`;
+    html+=`<div class="cell ${light?'light':'dark'}" onclick="tapSniper(${r},${c})">${labels}</div>`;
+  }
+  html+='</div>';
+  $('sniper-board-wrap').innerHTML=html;
+}
+
+function tapSniper(r, c) {
+  if(!sniper.active) return;
+  if(r===sniper.targetR && c===sniper.targetC) {
+    sniper.score++;
+    $('sniper-score').textContent = sniper.score;
+    soundCorrect();
+    nextSniperTarget();
+  } else {
+    soundWrong();
+    const wrap = $('sniper-board-wrap');
+    wrap.style.animation = 'none';
+    void wrap.offsetWidth; // Trigger reflow
+    wrap.style.animation = 'shake .4s ease';
+  }
+}
+
+function sniperTick() {
+  sniper.time--;
+  $('sniper-time').textContent = sniper.time + 's';
+  $('sniper-bar-fill').style.width = (sniper.time/30)*100 + '%';
+  if(sniper.time <= 0) {
+    clearInterval(sniper.timerId);
+    sniper.active = false;
+    endSniper();
+  }
+}
+
+function endSniperEarly() {
+  if(sniper.timerId) clearInterval(sniper.timerId);
+  sniper.active = false;
+  showPuzzles();
+}
+
+function endSniper() {
+  const coinsEarned = sniper.score * 5;
+  state.xp += coinsEarned;
+  addCoins(coinsEarned);
+  
+  $('reward-emoji').textContent = '🎯';
+  $('reward-title').textContent = 'Time Up!';
+  $('reward-subtitle').textContent = `You sniped ${sniper.score} squares!`;
+  $('xp-gained').textContent = `+${coinsEarned} XP • +${coinsEarned} 🪙`;
+  $('badge-earned').style.display = 'none';
+  $('reward-stars-container').style.display = 'none';
+  
+  soundFanfare();
+  launchConfetti();
+  
+  state.routingBackTo = 'puzzles';
+  showScreen('screen-reward');
+}
+
+// ============ LESSONS ============
 function startWorld(worldId){
   state.currentWorld=worldId;
-
-  // --- THE MUSIC DIRECTOR ---
-  // Now dynamically requests world1.mp3 through world9.mp3 based on the world clicked!
   changeMusic(`world${worldId}.mp3`);
-  // ------------------------
 
   const allLessons={1:WORLD1_LESSONS,2:WORLD2_LESSONS,3:WORLD3_LESSONS,4:WORLD4_LESSONS,5:WORLD5_LESSONS,6:WORLD6_LESSONS,7:WORLD7_LESSONS,8:WORLD8_LESSONS,9:WORLD9_LESSONS};
   const lessons=allLessons[worldId];
@@ -600,8 +700,6 @@ function showComingSoon(worldId){
 
 function startPractice(){
   stopVoice();
-  
-  // Randomly selects an intense track for Practice Mode
   const practiceTracks = ['world6.mp3', 'world7.mp3', 'world8.mp3', 'world9.mp3'];
   const randomTrack = practiceTracks[Math.floor(Math.random() * practiceTracks.length)];
   changeMusic(randomTrack);
@@ -648,7 +746,6 @@ function renderStep(){
   else if(step.type==='champion-board')renderChampionBoard(step,content);
   else if(step.type==='mini-game-quiz')renderMiniGameQuiz(step,content);
 
-  // Narrator Trigger
   setTimeout(()=>{
     let textToSpeak='';
     if(step.type==='story') textToSpeak=step.text+(step.speech?' '+step.speech:'');
@@ -1032,8 +1129,10 @@ function completePractice(){
   $('reward-emoji').textContent='🔁';$('reward-title').textContent='Practice Done!';$('reward-subtitle').textContent=`Round ${state.practiceRounds} complete!`;$('xp-gained').textContent=`+20 XP • +1 ⭐ • +10 🪙`;
   const ph=state.earnedBadges.includes('practice_hero')&&state.practiceRounds===5;
   if(ph){$('badge-earned').style.display='flex';$('badge-name').textContent='🔁 Practice Hero';$('badge-desc').textContent='Completed 5 practice rounds!';}else $('badge-earned').style.display='none';
+  $('reward-stars-container').style.display = 'flex';
   soundFanfare();launchConfetti();state.practiceMode=true;
   saveProgress();
+  state.routingBackTo = 'home';
   showScreen('screen-reward');
 }
 
@@ -1051,13 +1150,20 @@ function completeLesson(){
   const msg=praises[Math.min(w-1,8)];
   $('reward-emoji').textContent=msg[0];$('reward-title').textContent=msg[1];$('reward-subtitle').textContent=msg[2];$('xp-gained').textContent=`+50 XP • +3 ⭐ • +${state.coins} 🪙`;
   if(badge){$('badge-earned').style.display='flex';$('badge-name').textContent=badge.emoji+' '+badge.name;$('badge-desc').textContent=badge.desc;}else $('badge-earned').style.display='none';
+  $('reward-stars-container').style.display = 'flex';
   soundFanfare();launchConfetti();
   saveProgress();
+  state.routingBackTo = 'home';
   showScreen('screen-reward');
 }
 
 function afterReward(){
-  soundClick();if(state.practiceMode){startPractice();return;}
+  soundClick();
+  if (state.routingBackTo === 'puzzles') {
+    showPuzzles();
+    return;
+  }
+  if(state.practiceMode){startPractice();return;}
   const w=state.currentWorld;
   const allLessons={1:WORLD1_LESSONS,2:WORLD2_LESSONS,3:WORLD3_LESSONS,4:WORLD4_LESSONS,5:WORLD5_LESSONS,6:WORLD6_LESSONS,7:WORLD7_LESSONS,8:WORLD8_LESSONS,9:WORLD9_LESSONS};
   const lessons=allLessons[w];const wp=state.worldProgress[w]||0;
