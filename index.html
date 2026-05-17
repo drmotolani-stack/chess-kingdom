@@ -411,6 +411,8 @@ function stopVoice() {
 
 // Zero-Latency Fallback Voice
 function playNativeVoice(text) {
+  window.speechSynthesis.cancel();
+  
   const bgMusic = document.getElementById('bg-music');
   const utter = new SpeechSynthesisUtterance(text);
   const allVoices = window.speechSynthesis.getVoices();
