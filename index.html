@@ -76,7 +76,7 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .spacer{height:70px;}
 
 /* LESSONS */
-#screen-lesson{background:linear-gradient(180deg,#1a1a2e,#16213e);padding:0;overflow-y:auto;}
+#screen-lesson, #screen-sniper-lobby{background:linear-gradient(180deg,#1a1a2e,#16213e);padding:0;overflow-y:auto;}
 .lesson-header{width:100%;padding:1rem 1.5rem;display:flex;align-items:center;gap:1rem;background:rgba(255,255,255,.05);}
 .btn-back{background:rgba(255,255,255,.15);border:none;border-radius:50%;width:44px;height:44px;color:white;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0;}
 .lesson-title-header{font-family:'Fredoka One',cursive;color:white;font-size:1.2rem;flex:1;}
@@ -103,7 +103,17 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
 .cell.wrong{animation:shake .4s ease;}
 .cell:hover{filter:brightness(1.15);}
 .cell-piece{font-size:clamp(1rem,3.5vw,1.6rem);transition:transform .2s;pointer-events:none;line-height:1;display:flex;align-items:center;justify-content:center;}
-.coord-label{position:absolute;font-size:0.65rem;font-weight:bold;pointer-events:none;}
+
+/* High Visibility Coordinates */
+.coord-label{
+  position:absolute;
+  font-size:1rem;
+  font-weight:bold;
+  font-family:'Fredoka One',cursive;
+  color:#1a1a2e; /* Deep navy blue */
+  text-shadow: 0px 0px 3px white, 0px 0px 5px white, 0px 0px 8px white; /* Strong glowing halo */
+  pointer-events:none;
+}
 
 /* PIECES */
 .piece-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;width:100%;}
@@ -223,7 +233,7 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
   </div>
   <div class="map-title">Train Your Vision</div>
   <div class="worlds-container">
-    <div class="world-card unlocked" style="background:linear-gradient(135deg,#EF4444,#B91C1C)" onclick="soundClick();startSniper()">
+    <div class="world-card unlocked" style="background:linear-gradient(135deg,#EF4444,#B91C1C)" onclick="soundClick();showSniperLobby()">
       <div class="world-num">COORDINATES</div>
       <div class="world-name">Square Sniper 🎯</div>
       <div class="world-desc">Find the square before time runs out!</div>
@@ -243,6 +253,38 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
     <button class="nav-btn active" onclick="showPuzzles()"><span class="nav-btn-icon">🧩</span>Puzzles</button>
     <button class="nav-btn" onclick="showDashboard()"><span class="nav-btn-icon">📊</span>Progress</button>
     <button class="nav-btn" onclick="showTrophies()"><span class="nav-btn-icon">🏆</span>Trophies</button>
+  </div>
+</div>
+
+<div id="screen-sniper-lobby" class="screen">
+  <div class="lesson-header">
+    <button class="btn-back" onclick="showPuzzles()">←</button>
+    <div class="lesson-title-header">Square Sniper</div>
+    <div class="stat-badge">🪙 <span id="lobby-coins">0</span></div>
+  </div>
+  <div class="lesson-content">
+    <div class="lesson-card">
+      <span class="lesson-emoji">🎯</span>
+      <div class="lesson-heading">Welcome to Sniper!</div>
+      <div class="lesson-text">Letters are the streets, and numbers are the houses. Find where they meet!</div>
+      <div class="lesson-speech" style="font-size:1rem; margin-top:1rem;">Are you ready to test your vision?</div>
+    </div>
+    
+    <div class="lesson-card" style="margin-top:0.5rem; padding:1.2rem;">
+      <div class="lesson-heading" style="font-size:1.2rem;">Board Setup</div>
+      <div style="display:flex; justify-content:space-around; margin-top:1rem; gap:10px;">
+        <div class="piece-card" id="btn-play-white" onclick="setSniperColor(false)" style="border-color:var(--gold); background:rgba(255,215,0,.15); flex:1;">
+          <div style="font-size:2rem;">⚪</div>
+          <div class="piece-card-name">Play White</div>
+        </div>
+        <div class="piece-card" id="btn-play-black" onclick="setSniperColor(true)" style="flex:1;">
+          <div style="font-size:2rem;">⚫</div>
+          <div class="piece-card-name">Play Black</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-start" onclick="soundClick();startSniper()" style="margin-top:1rem; width:100%;">⏱️ Start 30s Timer!</button>
   </div>
 </div>
 
@@ -334,10 +376,7 @@ function toggleMute() {
   isMuted = !isMuted;
   document.getElementById('mute-btn').textContent = isMuted ? '🔇' : '🔊';
   const bgMusic = document.getElementById('bg-music');
-  const voicePlayer = document.getElementById('voice-player');
-  
   if (bgMusic) bgMusic.muted = isMuted;
-  if (voicePlayer) voicePlayer.muted = isMuted;
   if (isMuted) stopVoice();
 }
 
@@ -397,7 +436,6 @@ function playNativeVoice(text) {
   window.speechSynthesis.speak(utter);
 }
 
-// Convert Google's Base64 to Binary ArrayBuffer
 function base64ToArrayBuffer(base64) {
   const binaryString = window.atob(base64);
   const bytes = new Uint8Array(binaryString.length);
@@ -433,7 +471,6 @@ async function speakText(text) {
     const data = await response.json();
     
     if (data.audioContent) {
-      // THE REAL HARDWARE AUDIO INJECTION
       const ctx = getAudio();
       if (ctx.state === 'suspended') ctx.resume();
       
@@ -442,19 +479,15 @@ async function speakText(text) {
         activeVoiceSource = ctx.createBufferSource();
         activeVoiceSource.buffer = buffer;
         activeVoiceSource.connect(ctx.destination);
-        activeVoiceSource.onended = () => { 
-          if (bgMusic && !isMuted) bgMusic.volume = 0.15; 
-        };
+        activeVoiceSource.onended = () => { if (bgMusic && !isMuted) bgMusic.volume = 0.15; };
         activeVoiceSource.start(0);
       }, (e) => {
-        console.error("Audio decode error, using fallback", e);
         playNativeVoice(text);
       });
     } else { 
       throw new Error("No audio content"); 
     }
   } catch (error) { 
-    console.error("Google API failed, executing fallback:", error);
     playNativeVoice(text); 
   }
 }
@@ -514,7 +547,7 @@ let state={
   routingBackTo: null
 };
 
-let sniper={active:false, score:0, time:30, targetR:0, targetC:0, targetStr:'', timerId:null};
+let sniper={active:false, score:0, time:30, targetR:0, targetC:0, targetStr:'', timerId:null, isFlipped:false};
 
 function saveProgress() {
   try {
@@ -524,9 +557,7 @@ function saveProgress() {
       practiceRounds: state.practiceRounds, practiceCorrect: state.practiceCorrect, totalQuizCorrect: state.totalQuizCorrect
     };
     localStorage.setItem('chessKingdomState', JSON.stringify(dataToSave));
-  } catch(e) {
-    console.warn("Save blocked by Safari Private Browsing.", e);
-  }
+  } catch(e) {}
 }
 
 function loadProgress() {
@@ -566,9 +597,6 @@ function startJourney(){
   saveProgress();
   
   if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume();
-  const voicePlayer = document.getElementById('voice-player');
-  if (voicePlayer) { voicePlayer.src = 'data:audio/mp3;base64,//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq'; voicePlayer.volume = 0.01; voicePlayer.play().catch(e => {}); }
-
   const bgMusic=document.getElementById('bg-music');
   if(bgMusic) bgMusic.volume=0.15;
   changeMusic('welcome.mp3');
@@ -621,6 +649,35 @@ function renderWorlds(){
 }
 
 // ============ PUZZLES: SQUARE SNIPER ============
+function showSniperLobby() {
+  stopVoice();
+  $('lobby-coins').textContent = state.coins;
+  showScreen('screen-sniper-lobby');
+  
+  // Set default to White
+  setSniperColor(false);
+  
+  setTimeout(() => {
+    speakText("Welcome to Square Sniper! Letters are the streets, and numbers are the houses. Find where they meet!");
+  }, 400);
+}
+
+function setSniperColor(isBlack) {
+  soundClick();
+  sniper.isFlipped = isBlack;
+  if(isBlack) {
+    $('btn-play-black').style.borderColor = 'var(--gold)';
+    $('btn-play-black').style.background = 'rgba(255,215,0,.15)';
+    $('btn-play-white').style.borderColor = 'transparent';
+    $('btn-play-white').style.background = 'transparent';
+  } else {
+    $('btn-play-white').style.borderColor = 'var(--gold)';
+    $('btn-play-white').style.background = 'rgba(255,215,0,.15)';
+    $('btn-play-black').style.borderColor = 'transparent';
+    $('btn-play-black').style.background = 'transparent';
+  }
+}
+
 function startSniper() {
   stopVoice();
   changeMusic('world9.mp3'); 
@@ -636,33 +693,49 @@ function startSniper() {
 }
 
 function nextSniperTarget() {
-  sniper.targetR = Math.floor(Math.random()*8);
-  sniper.targetC = Math.floor(Math.random()*8);
-  const letter = String.fromCharCode(97 + sniper.targetC);
-  const number = 8 - sniper.targetR;
-  sniper.targetStr = `${letter}${number}`.toUpperCase();
+  const fileIdx = Math.floor(Math.random() * 8); // 0 to 7 (a to h)
+  const rankIdx = Math.floor(Math.random() * 8) + 1; // 1 to 8
+  const letter = String.fromCharCode(97 + fileIdx);
+  
+  sniper.targetStr = `${letter}${rankIdx}`.toUpperCase();
   $('sniper-target').textContent = `Find ${sniper.targetStr}!`;
   
+  // Executive Decision: For Rapid-Fire games, force zero-latency native voice instead of Cloud API
   playNativeVoice("Find " + sniper.targetStr);
+  
   renderSniperBoard();
 }
 
 function renderSniperBoard() {
   let html='<div class="chess-board" style="position:relative;">';
-  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
-    const light=(r+c)%2===0;
-    let labels = '';
-    if(c===0) labels += `<span class="coord-label" style="top:2px;left:4px;color:${light?'#88D49E':'#E2F0CB'}">${8-r}</span>`;
-    if(r===7) labels += `<span class="coord-label" style="bottom:2px;right:4px;color:${light?'#88D49E':'#E2F0CB'}">${String.fromCharCode(97+c)}</span>`;
-    html+=`<div class="cell ${light?'light':'dark'}" onclick="tapSniper(${r},${c})">${labels}</div>`;
+  
+  for(let r=0;r<8;r++) {
+    for(let c=0;c<8;c++) {
+      // Calculate true algebraic coordinates based on board orientation
+      const rank = sniper.isFlipped ? (r + 1) : (8 - r);
+      const fileCode = sniper.isFlipped ? (104 - c) : (97 + c);
+      const fileStr = String.fromCharCode(fileCode);
+      const sqStr = (fileStr + rank).toUpperCase();
+      
+      // Standard chess coloring: a1 is a dark square. file+rank % 2 == 0 is dark.
+      // E.g. 'a' (1) + 1 = 2 (Even -> Dark).
+      const fileNum = fileCode - 96; // 'a' = 1
+      const isLight = (fileNum + rank) % 2 !== 0;
+      
+      let labels = '';
+      if(c===0) labels += `<span class="coord-label" style="top:4px;left:6px;">${rank}</span>`;
+      if(r===7) labels += `<span class="coord-label" style="bottom:4px;right:6px;">${fileStr}</span>`;
+      
+      html+=`<div class="cell ${isLight?'light':'dark'}" onclick="tapSniper('${sqStr}')">${labels}</div>`;
+    }
   }
   html+='</div>';
   $('sniper-board-wrap').innerHTML=html;
 }
 
-function tapSniper(r, c) {
+function tapSniper(sqStr) {
   if(!sniper.active) return;
-  if(r===sniper.targetR && c===sniper.targetC) {
+  if(sqStr === sniper.targetStr) {
     sniper.score++;
     $('sniper-score').textContent = sniper.score;
     soundCorrect();
