@@ -113,6 +113,12 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
   color:#1a1a2e; /* Deep navy blue */
   text-shadow: 0px 0px 3px white, 0px 0px 5px white, 0px 0px 8px white; /* Strong glowing halo */
   pointer-events:none;
+  z-index: 10;
+}
+.glow-hint {
+  box-shadow: inset 0 0 15px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.6) !important;
+  animation: glow 1s ease-in-out infinite !important;
+  z-index: 2;
 }
 
 /* PIECES */
@@ -284,7 +290,12 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
       </div>
     </div>
 
-    <button class="btn-start" onclick="soundClick();startSniper()" style="margin-top:1rem; width:100%;">⏱️ Start 30s Timer!</button>
+    <div class="lesson-heading" style="font-size:1.2rem; margin-top:1rem; color:white;">Select Difficulty</div>
+    <div style="display:flex; flex-direction:column; gap:10px; margin-top:0.5rem; width:100%;">
+      <button class="btn-start" style="font-size:1.1rem; padding:0.8rem; background:linear-gradient(135deg, #4CAF50, #2E7D32); color:white;" onclick="soundClick();startSniper('scout')">🟢 Scout (60s) • Best: <span id="best-scout">0</span></button>
+      <button class="btn-start" style="font-size:1.1rem; padding:0.8rem;" onclick="soundClick();startSniper('sniper')">🟡 Sniper (30s) • Best: <span id="best-sniper">0</span></button>
+      <button class="btn-start" style="font-size:1.1rem; padding:0.8rem; background:linear-gradient(135deg, #EF4444, #B91C1C); color:white;" onclick="soundClick();startSniper('grandmaster')">🔴 Grandmaster • Best: <span id="best-gm">0</span></button>
+    </div>
   </div>
 </div>
 
@@ -292,9 +303,10 @@ body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#667eea,#
   <div class="sniper-header">
     <button class="btn-back" onclick="endSniperEarly()">←</button>
     <div class="stat-badge">⭐ Score: <span id="sniper-score">0</span></div>
+    <div class="stat-badge" style="background:rgba(0,0,0,0.3)">🏆 Best: <span id="sniper-best">0</span></div>
   </div>
   <div class="sniper-timer-wrap">
-    <div class="sniper-stats"><span>Time Left</span><span id="sniper-time">30s</span></div>
+    <div class="sniper-stats"><span>Time Left</span><span id="sniper-time" style="transition:color 0.2s;">30s</span></div>
     <div class="sniper-timer-bar"><div class="sniper-timer-fill" id="sniper-bar-fill"></div></div>
   </div>
   <div class="lesson-content" style="padding-top:0">
@@ -462,7 +474,7 @@ async function speakText(text) {
   const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
   const payload = {
     input: { text: text },
-    voice: { languageCode: 'en-US', name: 'en-US-Journey-F' }, 
+    voice: { languageCode: 'en-US', name: 'en-US-Journey-D' }, 
     audioConfig: { audioEncoding: 'MP3' }
   };
 
@@ -540,6 +552,7 @@ let state={
   completedLessons:[],earnedBadges:[],
   worldProgress:{1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0},
   practiceRounds:0,practiceCorrect:0,totalQuizCorrect:0,
+  highScores: {scout:0, sniper:0, grandmaster:0},
   currentWorld:null,currentLesson:null,currentStep:0,
   piecesDiscovered:[],lightedSquares:0,placedPawns:0,
   practiceMode:false,moveGame:null,rookCapture:null,pawnGame:null,pawnCapture:null,
@@ -547,14 +560,15 @@ let state={
   routingBackTo: null
 };
 
-let sniper={active:false, score:0, time:30, targetR:0, targetC:0, targetStr:'', timerId:null, isFlipped:false};
+let sniper={active:false, mode:'sniper', score:0, maxTime:30, time:30, targetType:'square', targetVal:'', targetStr:'', timerId:null, isFlipped:false};
 
 function saveProgress() {
   try {
     const dataToSave = {
       heroName: state.heroName, stars: state.stars, coins: state.coins, xp: state.xp, streak: state.streak,
       completedLessons: state.completedLessons, earnedBadges: state.earnedBadges, worldProgress: state.worldProgress,
-      practiceRounds: state.practiceRounds, practiceCorrect: state.practiceCorrect, totalQuizCorrect: state.totalQuizCorrect
+      practiceRounds: state.practiceRounds, practiceCorrect: state.practiceCorrect, totalQuizCorrect: state.totalQuizCorrect,
+      highScores: state.highScores
     };
     localStorage.setItem('chessKingdomState', JSON.stringify(dataToSave));
   } catch(e) {}
@@ -566,6 +580,7 @@ function loadProgress() {
     if (saved) {
       const parsed = JSON.parse(saved);
       state = { ...state, ...parsed };
+      if (!state.highScores) state.highScores = {scout:0, sniper:0, grandmaster:0};
       if (state.heroName) {
         const nameInput = document.getElementById('hero-name-input');
         if (nameInput) nameInput.value = state.heroName;
@@ -652,6 +667,10 @@ function renderWorlds(){
 function showSniperLobby() {
   stopVoice();
   $('lobby-coins').textContent = state.coins;
+  $('best-scout').textContent = state.highScores.scout;
+  $('best-sniper').textContent = state.highScores.sniper;
+  $('best-gm').textContent = state.highScores.grandmaster;
+  
   showScreen('screen-sniper-lobby');
   
   // Set default to White
@@ -678,31 +697,58 @@ function setSniperColor(isBlack) {
   }
 }
 
-function startSniper() {
+function startSniper(mode) {
   stopVoice();
   changeMusic('world9.mp3'); 
+  
+  sniper.mode = mode;
   sniper.score = 0;
-  sniper.time = 30;
+  sniper.maxTime = (mode === 'scout') ? 60 : 30;
+  sniper.time = sniper.maxTime;
   sniper.active = true;
+  
   $('sniper-score').textContent = '0';
-  $('sniper-time').textContent = '30s';
+  $('sniper-best').textContent = state.highScores[mode];
+  $('sniper-time').textContent = sniper.time + 's';
   $('sniper-bar-fill').style.width = '100%';
+  $('sniper-time').style.color = 'white';
+  
   showScreen('screen-sniper');
   nextSniperTarget();
   sniper.timerId = setInterval(sniperTick, 1000);
 }
 
 function nextSniperTarget() {
-  const fileIdx = Math.floor(Math.random() * 8); // 0 to 7 (a to h)
-  const rankIdx = Math.floor(Math.random() * 8) + 1; // 1 to 8
-  const letter = String.fromCharCode(97 + fileIdx);
-  
-  sniper.targetStr = `${letter}${rankIdx}`.toUpperCase();
+  const rand = Math.random();
+  if (sniper.mode === 'scout' && rand < 0.6) {
+    // 60% chance for a File or Rank drill in Scout mode
+    if (rand < 0.3) {
+      // Rank drill
+      const rankIdx = Math.floor(Math.random() * 8) + 1; // 1 to 8
+      const ordinals = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th'];
+      sniper.targetType = 'rank';
+      sniper.targetVal = rankIdx;
+      sniper.targetStr = `the ${ordinals[rankIdx-1]} rank`;
+    } else {
+      // File drill
+      const fileIdx = Math.floor(Math.random() * 8); // 0 to 7
+      const letter = String.fromCharCode(97 + fileIdx);
+      sniper.targetType = 'file';
+      sniper.targetVal = letter;
+      sniper.targetStr = `the ${letter.toUpperCase()}-file`;
+    }
+  } else {
+    // Standard Square Drill
+    const fileIdx = Math.floor(Math.random() * 8);
+    const rankIdx = Math.floor(Math.random() * 8) + 1;
+    const letter = String.fromCharCode(97 + fileIdx);
+    sniper.targetType = 'square';
+    sniper.targetVal = `${letter}${rankIdx}`;
+    sniper.targetStr = `${letter}${rankIdx}`.toUpperCase();
+  }
+
   $('sniper-target').textContent = `Find ${sniper.targetStr}!`;
-  
-  // Executive Decision: For Rapid-Fire games, force zero-latency native voice instead of Cloud API
   playNativeVoice("Find " + sniper.targetStr);
-  
   renderSniperBoard();
 }
 
@@ -711,37 +757,64 @@ function renderSniperBoard() {
   
   for(let r=0;r<8;r++) {
     for(let c=0;c<8;c++) {
-      // Calculate true algebraic coordinates based on board orientation
       const rank = sniper.isFlipped ? (r + 1) : (8 - r);
       const fileCode = sniper.isFlipped ? (104 - c) : (97 + c);
       const fileStr = String.fromCharCode(fileCode);
-      const sqStr = (fileStr + rank).toUpperCase();
+      const sqStr = fileStr + rank;
       
-      // Standard chess coloring: a1 is a dark square. file+rank % 2 == 0 is dark.
-      // E.g. 'a' (1) + 1 = 2 (Even -> Dark).
-      const fileNum = fileCode - 96; // 'a' = 1
+      const fileNum = fileCode - 96; 
       const isLight = (fileNum + rank) % 2 !== 0;
+      
+      let isTargetHint = false;
+      if (sniper.mode === 'scout') {
+        if (sniper.targetType === 'square' && sqStr === sniper.targetVal) isTargetHint = true;
+        if (sniper.targetType === 'file' && fileStr === sniper.targetVal) isTargetHint = true;
+        if (sniper.targetType === 'rank' && rank === sniper.targetVal) isTargetHint = true;
+      }
       
       let labels = '';
       if(c===0) labels += `<span class="coord-label" style="top:4px;left:6px;">${rank}</span>`;
       if(r===7) labels += `<span class="coord-label" style="bottom:4px;right:6px;">${fileStr}</span>`;
       
-      html+=`<div class="cell ${isLight?'light':'dark'}" onclick="tapSniper('${sqStr}')">${labels}</div>`;
+      html+=`<div class="cell ${isLight?'light':'dark'} ${isTargetHint?'glow-hint':''}" onclick="tapSniper('${sqStr}', '${fileStr}', ${rank})">${labels}</div>`;
     }
   }
   html+='</div>';
   $('sniper-board-wrap').innerHTML=html;
 }
 
-function tapSniper(sqStr) {
+function tapSniper(sqStr, fileStr, rankNum) {
   if(!sniper.active) return;
-  if(sqStr === sniper.targetStr) {
+  
+  let isCorrect = false;
+  if (sniper.targetType === 'square' && sqStr === sniper.targetVal) isCorrect = true;
+  if (sniper.targetType === 'file' && fileStr === sniper.targetVal) isCorrect = true;
+  if (sniper.targetType === 'rank' && rankNum === sniper.targetVal) isCorrect = true;
+
+  if(isCorrect) {
     sniper.score++;
     $('sniper-score').textContent = sniper.score;
+    
+    // Check and update high score instantly
+    if (sniper.score > state.highScores[sniper.mode]) {
+      state.highScores[sniper.mode] = sniper.score;
+      $('sniper-best').textContent = state.highScores[sniper.mode];
+    }
+    
     soundCorrect();
     nextSniperTarget();
   } else {
     soundWrong();
+    
+    // Grandmaster Penalty!
+    if (sniper.mode === 'grandmaster') {
+      sniper.time = Math.max(0, sniper.time - 2);
+      $('sniper-time').textContent = sniper.time + 's';
+      $('sniper-bar-fill').style.width = (sniper.time/sniper.maxTime)*100 + '%';
+      $('sniper-time').style.color = '#EF4444'; // Flash Red
+      setTimeout(() => { $('sniper-time').style.color = 'white'; }, 400);
+    }
+    
     const wrap = $('sniper-board-wrap');
     wrap.style.animation = 'none';
     void wrap.offsetWidth; 
@@ -752,7 +825,7 @@ function tapSniper(sqStr) {
 function sniperTick() {
   sniper.time--;
   $('sniper-time').textContent = sniper.time + 's';
-  $('sniper-bar-fill').style.width = (sniper.time/30)*100 + '%';
+  $('sniper-bar-fill').style.width = (sniper.time/sniper.maxTime)*100 + '%';
   if(sniper.time <= 0) {
     clearInterval(sniper.timerId);
     sniper.active = false;
@@ -767,13 +840,15 @@ function endSniperEarly() {
 }
 
 function endSniper() {
+  saveProgress(); // Ensure new high score is locked in
+  
   const coinsEarned = sniper.score * 5;
   state.xp += coinsEarned;
   addCoins(coinsEarned);
   
   $('reward-emoji').textContent = '🎯';
   $('reward-title').textContent = 'Time Up!';
-  $('reward-subtitle').textContent = `You sniped ${sniper.score} squares!`;
+  $('reward-subtitle').textContent = `You sniped ${sniper.score} targets!`;
   $('xp-gained').textContent = `+${coinsEarned} XP • +${coinsEarned} 🪙`;
   $('badge-earned').style.display = 'none';
   $('reward-stars-container').style.display = 'none';
