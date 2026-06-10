@@ -524,7 +524,8 @@
                     randomSq.classList.add('gold-glowing'); randomSq.innerHTML = `<span style="font-size:24px;">🪰</span>`;
                     break;
                 case "path":
-                    const length = missionProgress + 2; 
+                    // Fix: Cap sequence length at 4 squares max to prevent cognitive overload.
+                    const length = Math.min(missionProgress + 2, 4); 
                     document.getElementById("game-narrator-text").innerText = `Watch the secret path of ${length} squares closely, then repeat it structural step by step!`;
                     speakText("Watch the secret path closely, then repeat it.");
                     interactiveState.sequence = []; interactiveState.sequenceIndex = 0;
@@ -772,7 +773,11 @@
                 if(interactiveState.mistakesThisStep === 1) { updateCognitiveScore('persistence', 2); } 
                 else if(interactiveState.mistakesThisStep > 2) { updateCognitiveScore('persistence', -1); }
 
-                if (activeMission.type === 'path') { setTimeout(setupMissionStep, 800); }
+                if (activeMission.type === 'path') { 
+                    // Fix: Add a 2.5 second "chill" period and vocal encouragement before restarting
+                    setTimeout(() => speakText("Let's try again! Watch closely."), 500);
+                    setTimeout(setupMissionStep, 2500); 
+                }
             }
         }
 
