@@ -102,13 +102,13 @@
         
         /* Intelligence Dashboard */
         .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .dashboard-header h2 { color: var(--magic-cyan); text-shadow: 0 0 10px rgba(0, 229, 255, 0.2); }
+        .dashboard-header h2 { color: var(--magic-cyan); text-shadow: 0 0 10px rgba(0, 229, 255, 0.2); font-size: 22px; }
         .metric-container { display: flex; flex-direction: column; gap: 16px; }
         .metric-card { background-color: var(--panel-dark); border-radius: var(--radius-md); padding: 16px; border: 1px solid #334155; }
         .metric-info { display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; margin-bottom: 8px; }
         .metric-bar-bg { width: 100%; height: 12px; background-color: #0f172a; border-radius: 6px; overflow: hidden; border: 1px solid #334155; }
         .metric-bar-fill { height: 100%; background: linear-gradient(90deg, var(--magic-cyan) 0%, #0284c7 100%); width: 0%; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
-        .metric-desc { font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.3; }
+        .metric-desc { font-size: 12px; color: var(--text-muted); margin-top: 6px; line-height: 1.3; }
         
         /* Keyframes */
         @keyframes pulseMagic { 0%, 100% { box-shadow: 0 0 15px var(--magic-cyan), inset 0 0 10px #ffffff; transform: scale(1); } 50% { box-shadow: 0 0 40px var(--magic-cyan), inset 0 0 20px #ffffff; transform: scale(1.08); } }
@@ -149,7 +149,7 @@
             <div class="hud-group stars">
                 <span>⭐</span><span id="hud-stars">0</span>
             </div>
-            <button class="btn-parent" id="btn-toggle-dashboard">Parent Portal</button>
+            <button class="btn-parent" id="btn-toggle-dashboard">Growth Report</button>
         </div>
 
         <div id="screen-map" class="screen">
@@ -163,11 +163,11 @@
 
         <div id="screen-game" class="screen">
             <div class="game-header">
-                <span class="game-title" id="game-mission-title">Mission Matrix</span>
+                <span class="game-title" id="game-mission-title">Mission</span>
                 <span style="color: var(--accent-gold); font-weight: bold;" id="game-mission-progress">0/5</span>
             </div>
             <div class="narrator-bubble" id="game-narrator-text">
-                Loading mission parameters...
+                Loading mission...
             </div>
             
             <div class="board-container" id="game-board">
@@ -180,40 +180,61 @@
 
         <div id="screen-dashboard" class="screen">
             <div class="dashboard-header">
-                <h2>Cognia Profiler</h2>
+                <h2>Cognia Growth Report</h2>
                 <button class="btn-parent" id="btn-close-dashboard">Back to Game</button>
             </div>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">
-                Real-time tracking profiles compiled via continuous gameplay interaction loops.
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
+                Your child’s progress across key thinking skills, tracked quietly through gameplay.
             </p>
             <div class="metric-container">
                 <div class="metric-card">
                     <div class="metric-info"><span>Attention</span><span id="val-attention">0%</span></div>
                     <div class="metric-bar-bg"><div class="metric-bar-fill" id="bar-attention"></div></div>
-                    <p class="metric-desc">Evaluates target engagement accuracy and reaction parameters via the 1.5-second hesitation index.</p>
+                    <p class="metric-desc">How well your child focuses, follows instructions, and stays engaged during challenges.</p>
                 </div>
                 <div class="metric-card">
                     <div class="metric-info"><span>Pattern Recognition</span><span id="val-pattern">0%</span></div>
                     <div class="metric-bar-bg"><div class="metric-bar-fill" id="bar-pattern"></div></div>
-                    <p class="metric-desc">Analyzes grid color parsing efficiency and multi-coordinate sequence recall structures.</p>
+                    <p class="metric-desc">How quickly your child notices visual patterns, remembers paths, and recognizes movement rules.</p>
                 </div>
                 <div class="metric-card">
                     <div class="metric-info"><span>Decision Quality</span><span id="val-decision">0%</span></div>
                     <div class="metric-bar-bg"><div class="metric-bar-fill" id="bar-decision"></div></div>
-                    <p class="metric-desc">Measures the ratio of targeted first-touch selections against speculative trial clicking variants.</p>
+                    <p class="metric-desc">How well your child chooses the right option when there are multiple possible moves.</p>
                 </div>
                 <div class="metric-card">
                     <div class="metric-info"><span>Persistence</span><span id="val-persistence">0%</span></div>
                     <div class="metric-bar-bg"><div class="metric-bar-fill" id="bar-persistence"></div></div>
-                    <p class="metric-desc">Logs systemic resiliency metrics following target errors or procedural step adjustments.</p>
+                    <p class="metric-desc">How your child responds after mistakes, retries challenges, and keeps going.</p>
                 </div>
                 <div class="metric-card">
                     <div class="metric-info"><span>Strategic Thinking</span><span id="val-strategic">0%</span></div>
                     <div class="metric-bar-bg"><div class="metric-bar-fill" id="bar-strategic"></div></div>
-                    <p class="metric-desc">Tracks step vectoring matrices and multi-path navigation plans using explicit path constraints.</p>
+                    <p class="metric-desc">How well your child thinks ahead, follows multi-step paths, and solves connected problems.</p>
                 </div>
+                
+                <div class="session-summary metric-card" style="margin-top: 8px;">
+                    <h3 style="color: var(--magic-cyan); margin-bottom: 12px; font-size: 16px;">Session Summary</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 14px;">
+                        <div style="color: var(--text-muted);">Missions completed:</div>
+                        <div id="summ-missions" style="text-align: right; font-weight: bold; color: var(--text-light);">0/10</div>
+                        
+                        <div style="color: var(--text-muted);">Coins earned:</div>
+                        <div id="summ-coins" style="text-align: right; font-weight: bold; color: var(--accent-gold);">0</div>
+                        
+                        <div style="color: var(--text-muted);">Stars earned:</div>
+                        <div id="summ-stars" style="text-align: right; font-weight: bold; color: var(--magic-cyan);">0</div>
+                        
+                        <div style="color: var(--text-muted); margin-top: 8px;">Strongest skill:</div>
+                        <div id="summ-strongest" style="text-align: right; font-weight: bold; margin-top: 8px; color: var(--accent-green);">None</div>
+                        
+                        <div style="color: var(--text-muted);">Keep practicing:</div>
+                        <div id="summ-weakest" style="text-align: right; font-weight: bold; color: var(--accent-red);">None</div>
+                    </div>
+                </div>
+
             </div>
-            <button class="btn-action secondary" style="margin-top: 24px; margin-bottom: 24px;" id="btn-reset-data">Reset Profile Matrix</button>
+            <button class="btn-action secondary" style="margin-top: 24px; margin-bottom: 24px;" id="btn-reset-data">Reset Profile Data</button>
         </div>
 
         <div class="victory-overlay" id="victory-layer">
@@ -263,7 +284,7 @@
             }
         }
 
-        // ============ TTS ENGINE (THE TRAFFIC CONTROLLER) ============
+        // ============ TTS ENGINE ============
         let activeVoiceSource = null;
         let voiceTimeoutId = null;
         let voiceRequestId = 0;
@@ -355,16 +376,16 @@
         };
 
         const MISSIONS = {
-            1: { id: 1, name: "The Sleeping Board", desc: "Wake the dim squares with raw focus.", type: "wake", target: 6 },
-            2: { id: 2, name: "Firefly Hunt", desc: "Catch the glowing light bugs fast!", type: "firefly", target: 5 },
-            3: { id: 3, name: "The Magic Path", desc: "Repeat the glowing matrix sequence.", type: "path", target: 3 },
-            4: { id: 4, name: "Light and Shadow", desc: "Identify the light and dark energy tiles.", type: "colors", target: 6 },
-            5: { id: 5, name: "Meet the Castle Guardian", desc: "Awaken the heavy Rook armor unit.", type: "reveal", target: 1 },
-            6: { id: 6, name: "Castle Roads", desc: "Discover straight lines across the grid.", type: "roads", target: 5 },
-            7: { id: 7, name: "Treasure Roads", desc: "Harvest coins along straight channels.", type: "treasure", target: 4 },
-            8: { id: 8, name: "Rescue the Lost Pawns", desc: "Save friendly entities along paths.", type: "rescue", target: 4 },
-            9: { id: 9, name: "Castle Defense", desc: "Intercept shadow monsters instantly.", type: "defense", target: 5 },
-            10: { id: 10, name: "Boss Battle: Shadow Goblin", desc: "Synthesize all skills to defeat the goblin.", type: "boss", target: 5 }
+            1: { id: 1, name: "The Sleeping Board", desc: "Wake the sleeping squares and bring light back to the board.", type: "wake", target: 6 },
+            2: { id: 2, name: "Firefly Hunt", desc: "Catch the glowing fireflies before they fly away.", type: "firefly", target: 5 },
+            3: { id: 3, name: "The Magic Path", desc: "Watch the secret path, then tap the same squares.", type: "path", target: 3 },
+            4: { id: 4, name: "Light and Shadow", desc: "Find the light squares and shadow squares.", type: "colors", target: 6 },
+            5: { id: 5, name: "Meet the Castle Guardian", desc: "Meet the brave Rook who protects the castle.", type: "reveal", target: 1 },
+            6: { id: 6, name: "Castle Roads", desc: "Help the Castle Guardian move along straight roads.", type: "roads", target: 5 },
+            7: { id: 7, name: "Treasure Roads", desc: "Collect treasure using only straight castle roads.", type: "treasure", target: 4 },
+            8: { id: 8, name: "Rescue the Lost Pawns", desc: "Save the little soldiers trapped across the board.", type: "rescue", target: 4 },
+            9: { id: 9, name: "Castle Defense", desc: "Stop the shadow monsters before they reach the castle.", type: "defense", target: 5 },
+            10: { id: 10, name: "Boss Battle: Shadow Goblin", desc: "Use everything you have learned to defeat the Shadow Goblin.", type: "boss", target: 5 }
         };
 
         // --- ENTRY POINT: UNLOCKS AUDIO ---
@@ -421,6 +442,7 @@
         }
 
         function updateDashboardDOM() {
+            // Update Bars
             const list = ['attention', 'patternRecognition', 'decisionQuality', 'persistence', 'strategicThinking'];
             list.forEach(m => {
                 const domId = m === 'patternRecognition' ? 'pattern' : m === 'decisionQuality' ? 'decision' : m === 'strategicThinking' ? 'strategic' : m;
@@ -428,6 +450,30 @@
                 document.getElementById(`val-${domId}`).innerText = `${score}%`;
                 document.getElementById(`bar-${domId}`).style.width = `${score}%`;
             });
+            
+            // Calculate Session Summary Data
+            const scoreNames = {
+                attention: "Attention",
+                patternRecognition: "Pattern Recognition",
+                decisionQuality: "Decision Quality",
+                persistence: "Persistence",
+                strategicThinking: "Strategic Thinking"
+            };
+            
+            let maxScore = -1, minScore = 101;
+            let strongest = "None", weakest = "None";
+            
+            for (let key in state.cognitiveScores) {
+                let s = state.cognitiveScores[key];
+                if (s > maxScore) { maxScore = s; strongest = scoreNames[key]; }
+                if (s < minScore) { minScore = s; weakest = scoreNames[key]; }
+            }
+            
+            document.getElementById("summ-missions").innerText = `${state.completedMissions.length}/10`;
+            document.getElementById("summ-coins").innerText = state.coins;
+            document.getElementById("summ-stars").innerText = state.stars;
+            document.getElementById("summ-strongest").innerText = strongest;
+            document.getElementById("summ-weakest").innerText = weakest;
         }
 
         function switchScreen(screenId) {
@@ -512,22 +558,21 @@
 
             switch(activeMission.type) {
                 case "wake":
-                    document.getElementById("game-narrator-text").innerText = "The Great Board is sleeping and dark. Tap a sleeping glowing square to wake up its magic light engine!";
-                    speakText("The Great Board is sleeping. Tap a glowing square to wake up its magic!");
+                    document.getElementById("game-narrator-text").innerText = "The Great Board is asleep. Tap the glowing squares to wake its magic!";
+                    speakText("The Great Board is asleep. Tap the glowing squares to wake its magic!");
                     squares.forEach(s => s.classList.add('dimmed'));
                     Array.from(squares).sort(() => 0.5 - Math.random()).slice(0, 3).forEach(s => s.classList.add('glowing'));
                     break;
                 case "firefly":
-                    document.getElementById("game-narrator-text").innerText = "Catch the light bug! It is flying quickly across the grid panels.";
-                    speakText("Catch the light bug before it escapes!");
+                    document.getElementById("game-narrator-text").innerText = "Catch the firefly before it flies away!";
+                    speakText("Catch the firefly before it flies away!");
                     const randomSq = squares[Math.floor(Math.random() * squares.length)];
                     randomSq.classList.add('gold-glowing'); randomSq.innerHTML = `<span style="font-size:24px;">🪰</span>`;
                     break;
                 case "path":
-                    // Fix: Cap sequence length at 4 squares max to prevent cognitive overload.
                     const length = Math.min(missionProgress + 2, 4); 
-                    document.getElementById("game-narrator-text").innerText = `Watch the secret path of ${length} squares closely, then repeat it structural step by step!`;
-                    speakText("Watch the secret path closely, then repeat it.");
+                    document.getElementById("game-narrator-text").innerText = "Follow the secret path in the same order.";
+                    speakText("Follow the secret path in the same order.");
                     interactiveState.sequence = []; interactiveState.sequenceIndex = 0;
                     let currentDelay = 400;
                     for(let i=0; i<length; i++) {
@@ -540,24 +585,25 @@
                 case "colors":
                     const targetLight = Math.random() > 0.5;
                     interactiveState.colorTargetType = targetLight ? 'light' : 'dark';
-                    document.getElementById("game-narrator-text").innerText = `The energy channels balance carefully. Find and tap a ${interactiveState.colorTargetType === 'light' ? 'LIGHT' : 'SHADOW'} matrix square!`;
-                    speakText(`Find and tap a ${interactiveState.colorTargetType} square.`);
+                    const colorName = targetLight ? "light" : "shadow";
+                    document.getElementById("game-narrator-text").innerText = `Find the ${colorName} squares and tap them!`;
+                    speakText(`Find the ${colorName} squares and tap them!`);
                     break;
                 case "reveal":
-                    document.getElementById("game-narrator-text").innerText = "Greetings Hero! I am the Castle Guardian. I charge down straight castle roads! Tap my shield armor to initialize my alliance bonds.";
-                    speakText("Greetings Hero! I am the Castle Guardian. Tap my armor to join forces.");
+                    document.getElementById("game-narrator-text").innerText = "Tap me, hero. Let’s protect the castle together!";
+                    speakText("Tap me, hero. Let’s protect the castle together!");
                     const centerSq = document.querySelector(`[data-row="4"][data-col="4"]`);
                     centerSq.classList.add('gold-glowing'); centerSq.innerHTML = `<span style="font-size:28px; z-index:5;">🏰</span>`;
                     break;
                 case "roads":
-                    document.getElementById("game-narrator-text").innerText = "The Castle Guardian moves only along straight grid lines. Tap any lit square directly along my pathways to test my movement engines.";
-                    speakText("Choose a straight road for me to travel.");
+                    document.getElementById("game-narrator-text").innerText = "Choose a glowing straight road for the Castle Guardian.";
+                    speakText("Choose a glowing straight road for the Castle Guardian.");
                     renderRook(interactiveState.rookPos.r, interactiveState.rookPos.c);
                     highlightOrthogonal(interactiveState.rookPos.r, interactiveState.rookPos.c);
                     break;
                 case "treasure":
-                    document.getElementById("game-narrator-text").innerText = "Harvest the gold coin nodes along straight pathways! Watch out for diagonal mirage nodes that my armor can't reach.";
-                    speakText("Collect the treasure along my straight paths.");
+                    document.getElementById("game-narrator-text").innerText = "Collect the treasure along the straight roads.";
+                    speakText("Collect the treasure along the straight roads.");
                     renderRook(interactiveState.rookPos.r, interactiveState.rookPos.c);
                     const offset = Math.floor(Math.random() * 3) + 1;
                     const side = Math.random() > 0.5;
@@ -570,8 +616,8 @@
                     document.querySelector(`[data-row="${decoyR}"][data-col="${decoyC}"]`).innerHTML = `<span class="game-item" style="filter:grayscale(1);">💎</span>`;
                     break;
                 case "rescue":
-                    document.getElementById("game-narrator-text").innerText = "A friendly soldier unit is stuck directly down the runway. Charge straight down the lines to rescue them safely!";
-                    speakText("Move along the lines to rescue the pawn.");
+                    document.getElementById("game-narrator-text").innerText = "A little pawn is trapped. Move straight to rescue it!";
+                    speakText("A little pawn is trapped. Move straight to rescue it!");
                     renderRook(interactiveState.rookPos.r, interactiveState.rookPos.c);
                     let pawnR = interactiveState.rookPos.r; let pawnC = (interactiveState.rookPos.c + 3) % 8;
                     interactiveState.targetR = pawnR; interactiveState.targetC = pawnC;
@@ -579,8 +625,8 @@
                     pSq.innerHTML = `<span class="game-piece">♟️</span>`; pSq.classList.add('glowing');
                     break;
                 case "defense":
-                    document.getElementById("game-narrator-text").innerText = "Alert! A shadow core entity is approaching on our linear vector. Intercept and crush it instantly by crashing straight into it!";
-                    speakText("Intercept the shadow creature along our path!");
+                    document.getElementById("game-narrator-text").innerText = "Watch out! A shadow monster is coming. Move straight to stop it!";
+                    speakText("Watch out! A shadow monster is coming. Move straight to stop it!");
                     renderRook(interactiveState.rookPos.r, interactiveState.rookPos.c);
                     let monsterR = (interactiveState.rookPos.r + 2) % 8; let monsterC = interactiveState.rookPos.c;
                     interactiveState.targetR = monsterR; interactiveState.targetC = monsterC;
@@ -596,30 +642,30 @@
         function executeBossSubStage() {
             renderRook(interactiveState.rookPos.r, interactiveState.rookPos.c);
             if (missionProgress === 0) {
-                document.getElementById("game-narrator-text").innerText = "BOSS STAGE 1: The Shadow Goblin is mocking us! Dash down a straight clearance road to stabilize position metrics.";
-                speakText("Boss battle stage one! Move along a straight road.");
+                document.getElementById("game-narrator-text").innerText = "The Shadow Goblin is here! Move along a straight road to get ready.";
+                speakText("The Shadow Goblin is here! Move along a straight road to get ready.");
                 highlightOrthogonal(interactiveState.rookPos.r, interactiveState.rookPos.c);
             } else if (missionProgress === 1) {
-                document.getElementById("game-narrator-text").innerText = "BOSS STAGE 2: The Goblin dropped a coin cache! Snatch it along our vector grid lines.";
-                speakText("Stage two! Snatch the coin cache.");
+                document.getElementById("game-narrator-text").innerText = "The goblin dropped treasure. Collect it before he steals it back!";
+                speakText("The goblin dropped treasure. Collect it before he steals it back!");
                 let tr = interactiveState.rookPos.r; let tc = (interactiveState.rookPos.c + 2) % 8;
                 interactiveState.targetR = tr; interactiveState.targetC = tc;
                 document.querySelector(`[data-row="${tr}"][data-col="${tc}"]`).innerHTML = `<span class="game-item">🪙</span>`;
             } else if (missionProgress === 2) {
-                document.getElementById("game-narrator-text").innerText = "BOSS STAGE 3: Avoid the dark magic vortex spikes placed diagonally, and move safely to a vertical line option.";
-                speakText("Stage three! Avoid the trap and move safely.");
+                document.getElementById("game-narrator-text").innerText = "Careful! The goblin made a diagonal trap. Stay on the straight road.";
+                speakText("Careful! The goblin made a diagonal trap. Stay on the straight road.");
                 highlightOrthogonal(interactiveState.rookPos.r, interactiveState.rookPos.c);
                 let tr = (interactiveState.rookPos.r + 1) % 8; let tc = (interactiveState.rookPos.c + 1) % 8;
                 document.querySelector(`[data-row="${tr}"][data-col="${tc}"]`).innerHTML = `<span style="font-size:24px;">🌀</span>`;
             } else if (missionProgress === 3) {
-                document.getElementById("game-narrator-text").innerText = "BOSS STAGE 4: A captured pawn ally requires immediate evacuation! Secure their cell line position.";
-                speakText("Stage four! Cleanly secure the pawn cell.");
+                document.getElementById("game-narrator-text").innerText = "A pawn friend is captured. Rescue the pawn!";
+                speakText("A pawn friend is captured. Rescue the pawn!");
                 let tr = (interactiveState.rookPos.r - 2 + 8) % 8; let tc = interactiveState.rookPos.c;
                 interactiveState.targetR = tr; interactiveState.targetC = tc;
                 document.querySelector(`[data-row="${tr}"][data-col="${tc}"]`).innerHTML = `<span class="game-piece">♟️</span>`;
             } else if (missionProgress === 4) {
-                document.getElementById("game-narrator-text").innerText = "FINAL BLOW: The Goblin is exposed on our vector line! Crash directly into the Shadow Goblin to win the battle!";
-                speakText("Final blow! Strike down the shadow goblin!");
+                document.getElementById("game-narrator-text").innerText = "The Shadow Goblin is exposed. Move straight and strike!";
+                speakText("The Shadow Goblin is exposed. Move straight and strike!");
                 let tr = interactiveState.rookPos.r; let tc = (interactiveState.rookPos.c - 3 + 8) % 8;
                 interactiveState.targetR = tr; interactiveState.targetC = tc;
                 document.querySelector(`[data-row="${tr}"][data-col="${tc}"]`).innerHTML = `<span style="font-size:28px;">👹</span>`;
@@ -774,7 +820,6 @@
                 else if(interactiveState.mistakesThisStep > 2) { updateCognitiveScore('persistence', -1); }
 
                 if (activeMission.type === 'path') { 
-                    // Fix: Add a 2.5 second "chill" period and vocal encouragement before restarting
                     setTimeout(() => speakText("Let's try again! Watch closely."), 500);
                     setTimeout(setupMissionStep, 2500); 
                 }
