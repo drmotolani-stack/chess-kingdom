@@ -541,7 +541,7 @@
             activeMission = mission;
             missionProgress = 0;
             interactiveState = { mistakesThisStep: 0, sequence: [], sequenceIndex: 0, currentTarget: null, rookPos: {r: 4, c: 4} };
-            document.getElementById("game-mission-title").innerText = mission.name;
+            document.getElementById("game-mission-title").innerText = "Current Mission";
             updateProgressHUD(); buildChessBoardStructure(); switchScreen("screen-game");
             
             changeMusic('world1.mp3');
@@ -574,12 +574,43 @@
                     document.getElementById("game-narrator-text").innerText = "Follow the secret path in the same order.";
                     speakText("Follow the secret path in the same order.");
                     interactiveState.sequence = []; interactiveState.sequenceIndex = 0;
-                    let currentDelay = 400;
+                    
+                    const isSimpler = interactiveState.mistakesThisStep > 0;
+                    let currentDelay = isSimpler ? 800 : 400;
+                    let glowDuration = isSimpler ? 1200 : 600;
+                    let stepDelay = isSimpler ? 1400 : 900;
+                    
+                    let lastR = Math.floor(Math.random() * 8);
+                    let lastC = Math.floor(Math.random() * 8);
+                    
                     for(let i=0; i<length; i++) {
-                        const sq = squares[Math.floor(Math.random() * squares.length)];
-                        interactiveState.sequence.push({r: parseInt(sq.dataset.row), c: parseInt(sq.dataset.col)});
-                        setTimeout(() => { sq.classList.add('glowing'); setTimeout(() => sq.classList.remove('glowing'), 600); }, currentDelay);
-                        currentDelay += 900;
+                        let r = lastR, c = lastC;
+                        if (i > 0) {
+                            if (isSimpler) {
+                                const dirs = [[0,1], [1,0], [0,-1], [-1,0]];
+                                dirs.sort(() => Math.random() - 0.5);
+                                for(let d of dirs) {
+                                    let nr = lastR + d[0], nc = lastC + d[1];
+                                    if(nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+                                        r = nr; c = nc; break;
+                                    }
+                                }
+                            } else {
+                                r = Math.floor(Math.random() * 8);
+                                c = Math.floor(Math.random() * 8);
+                            }
+                        }
+                        lastR = r; lastC = c;
+                        
+                        interactiveState.sequence.push({r: r, c: c});
+                        setTimeout(() => { 
+                            const sq = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+                            if(sq) {
+                                sq.classList.add('glowing'); 
+                                setTimeout(() => sq.classList.remove('glowing'), glowDuration); 
+                            }
+                        }, currentDelay);
+                        currentDelay += stepDelay;
                     }
                     break;
                 case "colors":
@@ -854,14 +885,14 @@
                 updateCognitiveScore('persistence', 15);
                 updateCognitiveScore('strategicThinking', 10);
             } else {
-                document.getElementById("vic-title").innerText = "Mission Clear!";
+                document.getElementById("vic-title").innerText = "Mission Complete!";
                 document.getElementById("vic-desc").innerText = `Step ${activeMission.id} completed successfully.`;
                 document.getElementById("vic-icon").innerText = "🏆";
             }
 
             document.getElementById("victory-layer").classList.add("active");
             soundFanfare();
-            speakText(`Incredible job hero! Mission clear. You earned ${calculatedCoins} coins.`);
+            speakText(`Great job, hero! You earned ${calculatedCoins} coins.`);
         }
 
         // --- Initialization and Event Bindings ---
@@ -894,7 +925,7 @@
             });
 
             document.getElementById("btn-reset-data").addEventListener('click', () => {
-                if(confirm("Reset all cognitive records and coin inventories?")) {
+                if(confirm("Reset this child’s progress and Growth Report?")) {
                     state = {
                         heroName: state.heroName,
                         coins: 0,
