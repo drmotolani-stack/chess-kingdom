@@ -15,9 +15,9 @@
             --text-light: #f8fafc;
             --text-muted: #94a3b8;
             
-            /* CHANGED: Brighter board squares */
-            --board-light: #b0bec5;
-            --board-dark: #546e7a;
+            /* Sleeping Board & Neon Aesthetics */
+            --board-light: #1e293b; 
+            --board-dark: #0f172a;  
             --magic-cyan: #00e5ff;  
             
             --radius-md: 12px;
@@ -63,56 +63,11 @@
         .game-title { font-size: 18px; font-weight: bold; color: var(--magic-cyan); }
         .narrator-bubble { background-color: var(--panel-dark); border-radius: var(--radius-md); padding: 12px; font-size: 14px; line-height: 1.4; margin-bottom: 16px; border-left: 4px solid var(--magic-cyan); position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         
-        /* CHANGED: Board wrapper with coordinate labels */
-        .board-with-coords {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .board-rank-row {
-            display: flex;
-            width: 100%;
-            align-items: stretch;
-        }
-        .rank-labels {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            padding-right: 4px;
-            flex-shrink: 0;
-            width: 16px;
-        }
-        .rank-label {
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--magic-cyan);
-            text-align: center;
-            line-height: 1;
-            opacity: 0.85;
-        }
-        .file-labels {
-            display: flex;
-            justify-content: space-around;
-            padding-left: 20px; /* aligns with board, offset by rank labels width */
-            padding-top: 3px;
-            width: 100%;
-        }
-        .file-label {
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--magic-cyan);
-            text-align: center;
-            flex: 1;
-            opacity: 0.85;
-        }
-
-        /* The Board */
-        .board-container { flex: 1; aspect-ratio: 1; background-color: #020617; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,229,255,0.1); display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); border: 4px solid #1e293b; position: relative; }
+        /* The Sleeping Board */
+        .board-container { width: 100%; aspect-ratio: 1; background-color: #020617; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,229,255,0.1); display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); border: 4px solid #1e293b; position: relative; }
         .board-square { position: relative; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: background-color 0.15s, filter 0.15s; }
-        /* CHANGED: brighter light/dark squares */
-        .board-square.light { background-color: var(--board-light); border: 1px solid #90a4ae; }
-        .board-square.dark { background-color: var(--board-dark); border: 1px solid #37474f; }
+        .board-square.light { background-color: var(--board-light); border: 1px solid #334155; }
+        .board-square.dark { background-color: var(--board-dark); border: 1px solid #1e293b; }
         .board-square.dimmed { filter: brightness(0.4); }
         
         /* Aggressive Neon Cyan Searchlight Glow */
@@ -215,34 +170,8 @@
                 Loading mission...
             </div>
             
-            <!-- CHANGED: board wrapped with coordinate labels -->
-            <div class="board-with-coords">
-                <div class="board-rank-row">
-                    <!-- Rank labels 8 down to 1 -->
-                    <div class="rank-labels" id="rank-labels">
-                        <span class="rank-label">8</span>
-                        <span class="rank-label">7</span>
-                        <span class="rank-label">6</span>
-                        <span class="rank-label">5</span>
-                        <span class="rank-label">4</span>
-                        <span class="rank-label">3</span>
-                        <span class="rank-label">2</span>
-                        <span class="rank-label">1</span>
-                    </div>
-                    <div class="board-container" id="game-board"></div>
+            <div class="board-container" id="game-board">
                 </div>
-                <!-- File labels a through h -->
-                <div class="file-labels">
-                    <span class="file-label">a</span>
-                    <span class="file-label">b</span>
-                    <span class="file-label">c</span>
-                    <span class="file-label">d</span>
-                    <span class="file-label">e</span>
-                    <span class="file-label">f</span>
-                    <span class="file-label">g</span>
-                    <span class="file-label">h</span>
-                </div>
-            </div>
 
             <div class="game-controls">
                 <button class="btn-action secondary" id="btn-abort-game">Exit Mission</button>
@@ -255,7 +184,7 @@
                 <button class="btn-parent" id="btn-close-dashboard">Back to Game</button>
             </div>
             <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
-                Your child's progress across key thinking skills, tracked quietly through gameplay.
+                Your child’s progress across key thinking skills, tracked quietly through gameplay.
             </p>
             <div class="metric-container">
                 <div class="metric-card">
@@ -611,7 +540,8 @@
         function startMission(mission) {
             activeMission = mission;
             missionProgress = 0;
-            interactiveState = { mistakesThisStep: 0, sequence: [], sequenceIndex: 0, currentTarget: null, rookPos: {r: 4, c: 4} };
+            // Added isGenerating flag to track animation states
+            interactiveState = { mistakesThisStep: 0, sequence: [], sequenceIndex: 0, currentTarget: null, rookPos: {r: 4, c: 4}, isGenerating: false };
             document.getElementById("game-mission-title").innerText = "Current Mission";
             updateProgressHUD(); buildChessBoardStructure(); switchScreen("screen-game");
             
@@ -641,14 +571,18 @@
                     randomSq.classList.add('gold-glowing'); randomSq.innerHTML = `<span style="font-size:24px;">🪰</span>`;
                     break;
                 case "path":
-                    const length = Math.min(missionProgress + 2, 4); 
+                    // Strictly cap the difficulty: Max 3 moves.
+                    const length = missionProgress < 2 ? 2 : 3; 
                     document.getElementById("game-narrator-text").innerText = "Follow the secret path in the same order.";
                     speakText("Follow the secret path in the same order.");
-                    interactiveState.sequence = []; interactiveState.sequenceIndex = 0;
+                    
+                    interactiveState.sequence = []; 
+                    interactiveState.sequenceIndex = 0;
+                    interactiveState.isGenerating = true; // Lock the board during animation
                     
                     const isSimpler = interactiveState.mistakesThisStep > 0;
-                    let currentDelay = isSimpler ? 800 : 400;
-                    let glowDuration = isSimpler ? 1200 : 600;
+                    let currentDelay = 400;
+                    let glowDuration = isSimpler ? 1200 : 700;
                     let stepDelay = isSimpler ? 1400 : 900;
                     
                     let lastR = Math.floor(Math.random() * 8);
@@ -657,18 +591,14 @@
                     for(let i=0; i<length; i++) {
                         let r = lastR, c = lastC;
                         if (i > 0) {
-                            if (isSimpler) {
-                                const dirs = [[0,1], [1,0], [0,-1], [-1,0]];
-                                dirs.sort(() => Math.random() - 0.5);
-                                for(let d of dirs) {
-                                    let nr = lastR + d[0], nc = lastC + d[1];
-                                    if(nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-                                        r = nr; c = nc; break;
-                                    }
+                            // Always use adjacent connected squares so it looks like a continuous path
+                            const dirs = [[0,1], [1,0], [0,-1], [-1,0]];
+                            dirs.sort(() => Math.random() - 0.5);
+                            for(let d of dirs) {
+                                let nr = lastR + d[0], nc = lastC + d[1];
+                                if(nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+                                    r = nr; c = nc; break;
                                 }
-                            } else {
-                                r = Math.floor(Math.random() * 8);
-                                c = Math.floor(Math.random() * 8);
                             }
                         }
                         lastR = r; lastC = c;
@@ -683,6 +613,12 @@
                         }, currentDelay);
                         currentDelay += stepDelay;
                     }
+
+                    // Unlock the board after the entire sequence finishes showing
+                    setTimeout(() => {
+                        interactiveState.isGenerating = false;
+                    }, currentDelay);
+
                     break;
                 case "colors":
                     const targetLight = Math.random() > 0.5;
@@ -692,8 +628,8 @@
                     speakText(`Find the ${colorName} squares and tap them!`);
                     break;
                 case "reveal":
-                    document.getElementById("game-narrator-text").innerText = "Tap me, hero. Let's protect the castle together!";
-                    speakText("Tap me, hero. Let's protect the castle together!");
+                    document.getElementById("game-narrator-text").innerText = "Tap me, hero. Let’s protect the castle together!";
+                    speakText("Tap me, hero. Let’s protect the castle together!");
                     const centerSq = document.querySelector(`[data-row="4"][data-col="4"]`);
                     centerSq.classList.add('gold-glowing'); centerSq.innerHTML = `<span style="font-size:28px; z-index:5;">🏰</span>`;
                     break;
@@ -788,6 +724,9 @@
 
         // --- Interactive Telemetry & Mechanics Processing ---
         function handleSquareTap(r, c, element) {
+            // Block clicks during sequence animation to prevent glitch overlapping
+            if (interactiveState.isGenerating) return; 
+
             const latency = Date.now() - promptTimestamp;
             const isFast = latency < 1500;
 
@@ -996,7 +935,7 @@
             });
 
             document.getElementById("btn-reset-data").addEventListener('click', () => {
-                if(confirm("Reset this child's progress and Growth Report?")) {
+                if(confirm("Reset this child’s progress and Growth Report?")) {
                     state = {
                         heroName: state.heroName,
                         coins: 0,
